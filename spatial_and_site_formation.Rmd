@@ -1,0 +1,1389 @@
+---
+title: Supplementary Text S7. Site formation processes and spatial analysis of stratigraphic units 18 and 19 
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+- \setcounter{page}{70}
+output:
+  pdf_document: default
+editor_options:
+  markdown:
+    wrap: sentence
+---
+
+Marc Thomas, Brad Gravina, Francçois Bachellerie, Solange Rigaud, Laure Dayet, Eugène Morin, Dominique Todisco, Carolina Mallol, Isabelle Crevecoeur\bigskip
+\bigbreak
+
+```{r working_directory_data, echo = FALSE, message = FALSE, include=FALSE}
+
+# library loading
+library(dplyr)
+library(spatstat)
+library(ggplot2)
+library(cowplot)
+library(ggsci)
+library(raster)
+library(ggtern)
+library(CircStats)
+library(Ternary)
+library(circular)
+library(dbscan)
+library(factoextra)
+library(spatstat.local)
+library(bookdown)
+
+# working directory setting
+my_path <- getwd()
+data_xyz_sc <- read.csv(file = paste0(my_path, "/data/data_xyz_sc_bis.csv"), header = TRUE, sep = ";")
+data_granulo <- read.csv(file = paste0(my_path, "/data/data_granulo_sc.csv"), header = TRUE, sep = ";")
+model_granulo <- read.csv(file = paste0(my_path, "/data/model_granulo.csv"), header = TRUE, sep = ";")
+
+# select only the columns we need in data_xyz
+data_xyz <- data_xyz_sc %>% 
+  dplyr::select(c("id","x", "y", "z", "code", "det_mat_col", "group_fab", "bearing", "plunge", "article_corpus", "ACC", "surface_state_class", "species", "nature"))
+
+# select only the columns we need of unit 18 and 18/19 in data_xyz
+data_xyz_18 <- data_xyz_sc %>% 
+  dplyr::select(c("id","x", "y", "z", "code", "det_mat_col", "group_fab", "bearing", "plunge", "article_corpus", "ACC", "surface_state_class", "species", "nature", "Bodypart")) %>%
+  dplyr::filter(article_corpus %in% c('us18'))
+
+# 45 degrees rotation to follow the maximum slope direction
+data_xyz_45 <- dplyr::transmute(data_xyz, x = (x * cos(45*pi/180)) - (y * sin(45*pi/180))) %>%
+  dplyr::transmute(data_xyz, y = (x * sin(45*pi/180)) + (y * cos(45*pi/180))) %>%
+  dplyr::filter(x <= -10.5) %>%
+  dplyr::filter(x >= -11.5)
+
+```
+
+```{r fab1, echo = FALSE, message = FALSE, include = FALSE}
+
+
+# functions from McPherron 2018, note that some of them are modified
+# convert to radians
+rad <- function(deg) {
+  (deg * pi) / (180)
+}
+
+
+# data preparation for fabric analysis and all functions from McPherron 2018 (some of them are modified)
+
+data_fab <- data_xyz %>%
+  dplyr::filter(!is.na(bearing) & !is.na(plunge))%>%
+  dplyr::mutate(X1 = as.numeric(x)) %>%
+  dplyr::mutate(Y1 = as.numeric(y)) %>%
+  dplyr::mutate(Z1 = as.numeric(z)) %>%
+  dplyr::mutate(X2 = round(X1 + cos(rad(plunge)) * cos(rad(bearing)) * 0.05, 3)) %>%
+  dplyr::mutate(Y2 = round(Y1 + cos(rad(plunge)) * sin(rad(bearing)) * 0.05, 3)) %>%
+  dplyr::mutate(Z2 = round(Z1 - sin(rad(plunge)) * 0.05, 3)) %>%
+  dplyr::mutate(orientation_pi = dplyr::case_when(
+            bearing <= 180 ~ bearing,
+            bearing > 180 ~ bearing - 180
+          )
+        )
+
+
+
+# Convert radians to degrees
+deg <- function(radian) {
+  (radian * 180) / pi
+}
+
+
+benn = function(xyz, level = "All Points", min_sample = 30) {
+  
+  benn = matrix(nrow = length(unique(level)), ncol = 6, 
+                dimnames = list(unique(level),c("N","E1","E2","E3","IS","EL")))
+  
+  for (l in unique(level)) {
+    
+    xyz_level = subset(xyz, level==l)
+    
+    if (nrow(xyz_level) < min_sample) {
+      benn[l,] = c(nrow(xyz_level), rep(NA,5))
+      
+    } else {
+      
+      # Normalize and compute eigen values 
+      e = eigen_values(vector_normals(xyz_level))
+      
+      # Compute shape indices for Benn Diagram
+      isotropy = e$values[3] / e$values[1]
+      elongation = 1 - (e$values[2] / e$values[1])
+      
+      benn[l,] = c(nrow(xyz_level), e$values[1], e$values[2], e$values[3], isotropy, elongation) } } 
+  
+  return(benn) }
+
+
+
+eigen_values = function(xyz) {
+  
+  l = xyz[, 1]	# X
+  m = xyz[, 2]	# Y
+  n = xyz[, 3]	# Z
+  
+  # Build a matrix prior to computing eigen values
+  M11 = sum(l ^ 2)
+  M12 = sum(l * m)
+  M13 = sum(l * n)
+  M21 = sum(m * l)
+  M22 = sum(m ^ 2)
+  M23 = sum(m * n)
+  M31 = sum(n * l)
+  M32 = sum(n * m)
+  M33 = sum(n ^ 2)
+  M = matrix(c(M11,M12,M13,M21,M22,M23,M31,M32,M33), nrow = 3, ncol = 3)
+  
+  # Compute eigen values on matrix normalized for sample size
+  n = nrow(xyz)
+  return(eigen(M / n))    }
+
+
+
+vector_normals = function(xyz) {
+  
+  l = compute_lengths(xyz)
+  xnorm = ifelse(l != 0, (xyz$X1 - xyz$X2) / l, 0)
+  ynorm = ifelse(l != 0, (xyz$Y1 - xyz$Y2) / l, 0)
+  znorm = ifelse(l != 0, (xyz$Z1 - xyz$Z2) / l, 0) 
+  
+  return(cbind(xnorm, ynorm, znorm))  }
+
+
+
+compute_lengths = function(xyz) return( sqrt((xyz$X1-xyz$X2)^2 + (xyz$Y1-xyz$Y2)^2 + (xyz$Z1-xyz$Z2)^2) )
+
+
+
+benn_coords = function(benn) 	return(cbind(X = benn[,"elongation"] + (.5 * benn[,"isotropy"]), Y = benn[,"isotropy"] * .866))
+
+
+# this function has been modified (3D)
+spatial_benn = function(xyz, nearest = 50, maximum_distance = NA) {
+  
+  require(fields)
+  require(colorspace)
+  
+  benn = matrix(NA, nrow = nrow(xyz), ncol = 2, 
+                dimnames = list(rownames(xyz), c("elongation","isotropy")))
+  
+  # For each artifact, get the nearest artifacts and compute Benn values
+  for (k in 1:nrow(xyz)) {
+    centerx = xyz$X1[k]
+    centery = xyz$Y1[k]
+    centerz = xyz$Z1[k]
+    d = sqrt((centerx-xyz$X1)^2 + (centery-xyz$Y1)^2 + (centerz-xyz$Z1)^2)
+    sorted_pos = order(d)
+    if (!is.na(maximum_distance)) sorted_pos = sorted_pos[d[sorted_pos] <= maximum_distance]
+    xyz_subsample = xyz[sorted_pos[1:nearest], ]
+    benn [k,] = benn(xyz_subsample, min_sample = nearest)[,c("EL","IS")]
+  }
+  
+  # Calculate where the points would fall on Benn diagram so colors can be assigned
+  b = benn_coords(cbind(elongation = benn[,"elongation"], isotropy = benn[,"isotropy"]))
+  xp = b[,1]
+  yp = b[,2]
+  
+  # Assign colors
+  color_range = two.colors(n=21, start="green", end="red", middle="yellow")
+  point_color = color_range[xp * 20 + 1]
+  rgb_color = hex2RGB(point_color)
+  hsv_color = t(rgb2hsv(rgb_color@coords[,1], rgb_color@coords[,2], rgb_color@coords[,3]))
+  point_color = hsv(hsv_color[,1],1-yp,1)
+  
+  return(list(benn)) }
+
+# this function has been modified (3D and Rayleigh test)
+spatial_bearing = function(xyz, nearest = 50) {
+  
+  # Make a place to hold the computed mean bearings of nearest neighbors
+  near_avg_bearing_p = vector(mode = "numeric", length = nrow(xyz))
+  near_avg_bearing_Rbar = vector(mode = "numeric", length = nrow(xyz))
+  
+  # Go through each artifact, get the nearest (default is 39), and compute mean bearing angle
+  for (k in 1:nrow(xyz)) {
+    centerx = xyz$X1[k]
+    centery = xyz$Y1[k]
+    centerz = xyz$Z1[k]
+    d = sqrt((centerx-xyz$X1)^2 + (centery-xyz$Y1)^2 + (centerz-xyz$Z1)^2)
+    xyz_subsample = xyz[order(d)[1:nearest],]
+    
+    # Get the mean bearing angle, test significance, and mean plunge angle of this subset of artifacts
+    near_avg_bearing_p[k] = round(r.test(2*xyz_subsample$orientation_pi,degree=TRUE)$p.value, 2)
+    near_avg_bearing_Rbar[k] = round(r.test(2*xyz_subsample$orientation_pi,degree=TRUE)$r.bar, 2)
+  }
+  
+  # Color coding based on average bearing and on average plunge (higher plunge angles are more less saturated - i.e. more white)
+  return(list(p = near_avg_bearing_p, L = near_avg_bearing_Rbar*100)) }
+
+
+# Rose.diag from CircStats package adapted to do only plunge angle from 0 to 90,
+# to deal with angles that turn clockwise, and some other customizations.
+rose_diagram_plunge <- function(x, bins = 10, main = "", prop = 1,
+                                cex = 1, pch = 19, pts_on_edge = FALSE,
+                                color_codes = NULL, color_filled = NULL,
+                                pnt_col = "black", bar_col = "white", bg = "white",
+                                dotsep = 40, shrink = 1, ...) {
+  x <- rad(x)
+  x <- x %% (2 * pi)
+  plot(cos(seq(3 / 4 * 2 * pi, 2 * pi, length = 1000)),
+    sin(seq(3 / 4 * 2 * pi, 2 * pi, length = 1000)),
+    axes = FALSE, xlab = "", ylab = "", main = "", type = "l",
+    xlim = shrink * c(-.15, 1.15), ylim = shrink * c(-1.15, 0.15), asp = 1
+  )
+  polygon(c(0, cos(seq(3 / 4 * 2 * pi, 2 * pi, length = 1000))),
+    c(0, sin(seq(3 / 4 * 2 * pi, 2 * pi, length = 1000))),
+    col = bg
+  )
+  # text(-.88,1.05,main,cex=1.1)
+  text(-.03, .1, main, cex = cex * 1.1)
+  lines(c(0, 0), c(-0.9, -1))
+  text(0.005, -1.075, "90", cex = cex * 1.1)
+  lines(c(0.9, 1), c(0, 0))
+  text(1.05, 0, "0", cex = cex * 1.1)
+  lines(c(0, 0), c(-1, 0))
+  n <- length(x)
+  freq <- c(1:bins)
+  arc <- (1 / 2 * pi) / bins
+  for (i in 1:bins) {
+    newi <- bins - i + 1 # This turns the angles clockwise
+    freq[i] <- sum(x <= newi * arc & x > (newi - 1) * arc)
+  }
+  rel.freq <- freq / n
+  radius <- sqrt(rel.freq) * prop
+  # radius <- freq/max(freq) * prop     					  # This will bring bars to circle but with flat proportions
+  radius <- radius / max(radius) * prop # This will bring bars to circle but with exponential proportions
+  sector <- seq(0, 1 / 2 * pi - (1 / 2 * pi) / bins, length = bins)
+  sector <- sector - (pi / 2) # This rotates them to the right spot
+  mids <- seq(arc / 2, 1 / 2 * pi - (pi / 4) / bins, length = bins)
+  index <- cex / dotsep
+  for (i in 1:bins) {
+    if (rel.freq[i] != 0) {
+      xp <- c(0, radius[i] * cos(sector[i]), radius[i] * cos(sector[i] + (1 / 2 * pi) / bins))
+      yp <- c(0, radius[i] * sin(sector[i]), radius[i] * sin(sector[i] + (1 / 2 * pi) / bins))
+      polygon(xp, yp, col = bar_col, ...)
+
+      if (pts_on_edge) {
+        xp <- cos(x)
+        yp <- -sin(x)
+        if (!is.null(color_codes)) {
+          points(xp[color_filled], yp[color_filled],
+            cex = (cex * .8),
+            col = color_codes[color_filled], pch = 19
+          )
+          points(xp[!color_filled], yp[!color_filled],
+            cex = (cex * .8),
+            col = color_codes[!color_filled], pch = 21
+          )
+        } else {
+          points(xp, yp, cex = (cex * .8), pch = pch, col = pnt_col)
+        }
+      }
+    }
+  }
+}
+
+
+# Function to plot points on circle in Schmidt equal area space
+# Code to draw circle taken from rose.diag in CircStats package
+# Angles should be in decimal degrees
+
+schmidt_diagram <- function(bearing = NULL, plunge = NULL, angles = NULL,
+                            level = "All Points", color_codes = NULL,
+                            color_filled = FALSE, redraw = TRUE, col = "black",
+                            pch = 19, cex = 1, main = "", ...) {
+  library(CircStats)
+
+  if (is.null(angles) & (is.null(bearing) | is.null(plunge))) stop("Not enough data passed to schmidt.diagram.2shot. Bearing and plunge angles are required.")
+
+  if (!is.null(angles)) {
+    plunge <- angles[, 1]
+    bearing <- angles[, 2]
+  }
+
+  level <- factor(level)
+
+  for (l in levels(level)) {
+    bearing_angle_level <- subset(bearing, level == l)
+    plunge_angle_level <- subset(plunge, level == l)
+
+    # If the circle doesn't already exist (from doing a Rose diagram), then make it
+    if (length(levels(level)) > 1) {
+      if (!exists("main")) draw_circle_diagram(main = l, ...) else draw_circle_diagram(main = main[which(levels(level) == l)], ...)
+    } else {
+      if (redraw) draw_circle_diagram(...)
+    }
+
+    # Shift points into Schmidt space
+    d <- sin(rad((90 - plunge_angle_level) / 2)) / sin(rad(45))
+    x <- d * sin(rad(bearing_angle_level))
+    y <- d * cos(rad(bearing_angle_level))
+
+    # Plot them using color coding or not
+    if (!is.null(color_codes)) {
+      points(x[color_filled], y[color_filled],
+        cex = (cex * .8),
+        col = color_codes[color_filled], pch = 19
+      )
+      points(x[!color_filled], y[!color_filled],
+        cex = (cex * .8),
+        col = color_codes[!color_filled], pch = 21
+      )
+    } else {
+      points(x, y, cex = (cex * .8), pch = pch, col = col)
+    }
+  }
+}
+
+
+# Internal function to setup a circular graph for rose or schmidt diagrams
+draw_circle_diagram <- function(bg = "white", cex = 1, main = "", ...) {
+  plot(cos(seq(0, 2 * pi, length = 1000)), sin(seq(0, 2 * pi, length = 1000)),
+    axes = FALSE,
+    xlab = "", ylab = "", main = "", type = "n", xlim = c(-1.1, 1.1), ylim = c(-1.1, 1.1), asp = 1
+  )
+  polygon(cos(seq(0, 2 * pi, length = 1000)), sin(seq(0, 2 * pi, length = 1000)), col = bg)
+
+  text(-.88, 1.05, main, cex = (cex * 1.1))
+  lines(c(0, 0), c(0.9, 1))
+  text(0.005, 1.10, "0", cex = (cex * 1.1))
+  lines(c(0, 0), c(-0.9, -1))
+  text(0.005, -1.11, "180", cex = (cex * 1.1))
+  lines(c(-1, -0.9), c(0, 0))
+  text(-1.16, 0, "270", cex = (cex * 1.1))
+  lines(c(0.9, 1), c(0, 0))
+  text(1.13, 0, "90", cex = (cex * 1.1))
+  lines(c(-.05, .05), c(0, 0))
+  lines(c(0, 0), c(-0.05, .05))
+}
+
+
+```
+
+Here we present analyses designed to test the spatial relationship between the Châtelperronian and Mousterian lithics and the shell beads, coloring materials, and four major prey species in the SU 18-19 faunal assemblage. In addition, we discuss any potential relationships within the framework of a site formation model built from multiple geoarchaeological analyses, namely fabrics and artifact size distributions, as well as a consideration of lithic surface alterations and the systematic conjoining of flake and blade fragments. In the end, the analytical results and their consistency make it possible to propose a solid scenario for the formation of this mixed assemblage.
+
+For the sake of tansparency, the parameter adopted in this study are justified in the text below. The R script is also provided (accessible at this adress <https://github.com/marchaeologist>) to enable the reader to reproduce the statistical tests, plots, and projections using the same criteria.
+The code chunks can be run individually or with the “include” argument changed from ‘FALSE’ to ‘TRUE’ in the code chunks headers of the R markdown document or knit the document to the desired format (pdf, html or word).
+This is an essential prerequisite, since some of the tools used are totally objective or discriminating.\bigbreak
+
+# Methods
+
+We combined traditional spatial projections in plan view and sagittal transects with Kernel density analyses and spatial statistics to test for any structure and spatial relationships (Ripley’s K functions ; Baddeley 2008).
+The results of the spatial analysis were combined with consideration of artifact orientations and plunge (*i.e.* fabrics) and the horizontal and vertical size distribution of the lithic remains.\bigbreak
+
+**Piece plotted spatial projections**
+
+We generated projections of piece-plotted artifacts both in plan view (XY axis) and following the general SE-NW slope of SU 18-19 (sagittal projections along the YZ axis).
+The field coordinates were rotated 45° uniquely for the sagittal projections.
+To avoid squeezing a complex geometric reality (cone) into a single plane, the sagittal projections represent a one-meter thick transect following the primary slope of the deposits (-11.5 \< x \< -10.5).
+\bigbreak
+
+**Kernel density and Ripley functions**
+
+Point patterns have two main properties: its intensity (*i.e.* "spatial preference", first-order property) and the neighbourhood relationship between points (second-order property).
+A point pattern is homogeneous when its intensity does not vary within the observation window.
+A Kernel density analysis is used to describe this first property.
+Ripley's K-functions are used to analyse the second-order property (Ripley 1976, Baddeley *et al* 2015).
+Theses analyses applied to the horizontal (XY axis) projection of all piece-plotted material were carried out uniquely for SU 18 using the *spastats* package in R (Baddley *et al* 2015).
+
+The Ripley's "K" function (*i.e.* *spatstat*::Kest()) describe the structure of a 2D point pattern by comparing it at a complete random distribution (Poisson process) in a window of observation (Ripley 1976).
+The point pattern structure is :
+
+-   random when K *obs.* (r) = K *poisson* ;
+
+-   aggregated when K *obs.* (r) \> K *poisson* ;
+
+-   regular when K *obs.* (r) \< K *poisson*.
+
+The Ripley's K intertype function (*i.e.* *spatstat*::Kcross()) tests for spatial dependency between types of points.
+The nature of the spatial link between the two types observed is considered :
+
+-   attractive when K *obs*.
+    (r) \> K *poisson* ;
+
+-   repulsive when K *obs.* (r) \< K *poisson* ;
+
+-   reflecting no patterning (*i.e.* random) when K *obs.* (r) = K *poisson* (CSR, Complete Spatial Randomness).
+
+To test the significance of the results, a Poisson process (CSR) is simulated 99 times using the Monte Carlo method.
+The critical values of the simulated Poisson processes (*i.e.* the upper and lower limits) fix the limits of the grey reference envelope.
+
+Aggregation or attractive relations between points or types can also be due to inhomogeneity in the point pattern (a “spatial preference”). There are two ways around this difficulty: using functions appropriate to heterogeneous point patterns (*spatstat*::Kinhom() and *spatstat*::Kcross.inhom()) and sampling a smaller window of observation where the point pattern is more homogeneous. The window selected for the K Ripley’s tests corresponds to a square containing all the remains of a type. For the K intertype tests, the selected window is a square that contains all the incidences of the type with the smallest spatial extent. For the Châtelperronian lithics, shell beads and pigments, this corresponds to a 1.5 square metre window. Correction of edge effects was done using the “isotropic” method.
+
+\bigbreak
+
+**Fabric analysis**
+
+The Fabryka application (available at https://marchaeologist.shinyapps.io/fabryka/) was used to perform the fabric analysis. The main methods used are summarised below, and further information concerning the methods used are available in the application. All figures and statistics can be reproduced using the fabric data file available in the SOM of this article directly in the application.
+
+During excavations, the fabric (*i.e.* bearing and plunge) was systematically measured for all artifact types longer than 4 cm and with an elongation ratio (L/w) greater than 2.
+The bearing of the lower point is measured in the interval between 0 and 360° and the plunge between 0 and 90°.
+The bearing can be converted into an orientation in the interval [0;180] by subtracting 180° from the measurements belonging to the interval [180;360].
+Two main statistical methods are used to characterize the fabric of a given assemblage (Bertran and Lenoble, 2002).
+The first focuses on the direction of measurements only.
+The orientation rate “r” (formula (1), or “L” when expressed as a percentage; Curray, 1956) allows the hypothesis of a unimodal distribution of artifact orientations to be tested.
+If the “p” value returned by the Rayleigh test (2) is less than 0.05, the null hypothesis of a random orientation from a uniform distribution can be rejected (Fig. S7-2).
+The second statistical method takes into account artifact orientation and plunge.
+Three normalized eigenvalues (E1, E2 and E3) are calculated from the cosine formed by the axis of the artifact with the three axes of space.
+Benn’s indices (1994) are used to describe fabric shape.
+The elongation index EL is equal to 1-(E2/E1) and the isotropy index IS is equal to E3/E1.
+When EL is high, object axes are grouped around one bearing.
+When IS is high, the fabric is isotropic and the axes are dispersed.
+Finally, when the 1-EL-IS value is high, the fabric is planar and the axes of the objects are grouped around a plane.
+
+According to geomorphological observations in natural settings (Bertran and Texier 1995, Bertran and Lenoble 2002, Bertran and Coutard 2004), the action of certain sedimentary processes results in specific fabrics:
+
+-   IS is high: argiliturbation, rock fall cones, bioturbation;
+
+-   EL is high: solifluction, steep or shallow runoff on high slope;
+
+-   PL is high: undisturbed archaeological assemblages, shallow runoff.
+
+In order to distinguish different statistical populations, we used the spatial exploration method proposed by McPherron (2018).
+This method makes it possible to calculate Benn indices and to test the orientation rate L (formula (3) modified R after McPherron’s 2018 script) for each artifact, taking into account its n nearest neighbors in three dimensions (R McPherron 2018 script, modified formula (4)).
+The fabric analysis proposed by McPherron (2018) has the advantage of spatializing the measurements and thus avoiding the arbitrary sampling traditionally carried out by square or spit.
+The statistical signal of a population can be explored more locally  by varying the number of measurements sampled when calculating Benn indices.
+The choice of 50 measurements (each artifact and its 50 closest neighbors) to calculate the Benn indices allows local particularities to be observed, and above all, it allows the Rayleigh test to be carried out in its field of application (stability of the test between 40 and 50 measurements).
+Mean values of Benn indices and Rayleigh tests (mean values of each series) are provided for each sample.
+The data is represented in several different ways.
+The Benn indices (1994) calculated for each series of remains are projected on a ternary diagram, where each pole (isotropic, linear, and planar) is colored, respectively, in red, green and blue.
+This RGB color code is the same for projections in plan view, where the orientation of the objects is materialized by lines whose color corresponds to fabric populations formed by the objects’ 50 closest neighbors.
+Rose diagrams summarize the orientation and plunge measurements and Schmidt diagrams depict the bearing and plunge measurements for each object.
+The mean IS, EL indices, mean orientation rate L and p-value returned by the Rayleigh test and corresponding rejection ratio (formula (3)) are provided.
+
+(1)$$ r = \sqrt{\sum_{i=\alpha}^n sin{(2\alpha)} + \sum_{i=\alpha}^n cos{(2\alpha)}}  $$
+
+(1.1)$$L =\frac{r*100}{n} $$ 
+
+The « p-value » returned by the Rayleigh test is :
+
+(2)$$p = e^{(-(n*L^2))*10^-4}$$
+
+(3) $$Tr = \frac{(n~times~p.value < 0,05)* 100}{n}$$
+
+\bigbreak
+
+**Particle size distribution of flint remains**
+
+The particle size distribution of the lithic remains is carried out using granulizeR (<https://marchaeologist.shinyapps.io/granulizeR/>).
+All figures and statistics can be reproduced using the particle size data file available in the SOM of this article directly in the application.
+The application uses the method proposed by Lenoble (2005) and Bertran *et al.* (2006b).
+The archaeological samples are compared to an experimental knapping particle size model in a ternary diagram.
+We have adapted the particle size distribution model to the technological content of SU 18-19 by combining data from the experimental Levallois, discoidal and blade reduction sequences available in Bertran *et al.* (2006a).
+The model (blue area) is constructed using the Mahalanobis  method (detection of the outliers in the dataset) and takes into account the counts of lithic artifacts between 2 and 4 mm, 4 and 10 mm, and greater than 10 mm.\bigbreak
+
+**Systematic conjoining of lithic fragments from SU 18 and SU 18-19**
+
+The systematic testing of conjoinable lithic fragments can provide important information concerning the transport of material both during occupations (*i.e.* anthropogenic action) and the site formation processes (*i.e.* natural).
+This method involves a systematic search for "fracture connections" (Tixier 1980) on blade and flake fragments, whether retouched or not (Bordes 2000).
+A systematic conjoining program offers two advantages compared to the traditional refitting.
+Firstly, in the vast majority of cases, the two surfaces of a break are complementary over their entire surface, making it easier to identify connections compared to refitting dorsal and ventral surfaces.
+Moreover, due to its systematic nature, results are easily quantifiable, allowing success rates to be compared between layers or sites.
+
+The systematic search for fracture connections amongst the SU 18-19 lithic assemblage was carried out in several stages:
+
+-   first, all flake and blade fragments with a break greater than 15 mm long and a thickness greater than 5 mm were selected;
+
+-   once isolated, these pieces were divided into proximal, mesial and distal fragments;
+
+-   in order to optimize testing between fragments, fragments were then grouped according to raw material, the presence or absence as well as location of cortex, and the size of the break;
+
+-   the fragments were then arranged on large tables according to these criteria;
+
+-   finally, potentially conjoinable pieces were compared one by one.
+    For example, all proximal fragments were compared with the mesial and distal fragments, mesial fragments between themselves, and then mesial with distal fragments.
+
+The conjoin success rate (P) was then calculated as: (4) $$P = number~of~connections~found~/~total~number~of~fragments* 100$$
+
+# Results
+
+## Spatial projections of plotted pieces per stratigraphic units and types
+
+Projections of the assemblage by stratigraphic field units (SU) depict a single layer of archaeological material whose rocky base appears less dense in archaeological material (fig. S7-\ref{field_us_projection}).
+No immediately perceptible organization is evident when the Châtelperronian and Mousterian lithics, shell beads and pigments are projected in sagittal view (fig. S7-\ref{projection_types}B).
+However, in plan view (fig. S7-\ref{projection_types}A), the Châtelperronian lithics appear to cluster in the square K5 (-12,0 < x < - 11,0 and 5,0 < y < 6,0).
+The projections in plan and section of the five main species comprising the SU 18-19 faunal assemblage reveal no clearly identifiable patterning (fig. S7- \ref{species_projection}.
+The visual inspection of artifact projections in plan and section are insufficient to reliably associate the shell beads, pigments or specific species with either the Mousterian or Châtelperronian component of SU 18-19.
+\bigbreak
+
+```{r field_us_projection, cache = TRUE, fig.cap="Plan view (A) and one-meter thick transect (B; Y-Z with 45° rotation of XY axis) of all piece-plotted material from SU 18, 18/19 and 19 \\label{field_us_projection}", echo = FALSE, message = FALSE, fig.height = 8}
+
+xy_proj <- ggplot(data_xyz,aes(x, y, color=as.factor(article_corpus))) + 
+  geom_point() + 
+  scale_color_manual(values = c('#868686FF', '#EFC000FF', '#0073C2FF', '#CD534CFF')) +
+  theme(legend.position = c(1,1),
+        legend.justification = c("right", "top"),
+        legend.box.just = "right",
+        legend.margin = margin(6, 6, 6, 6)) +
+        theme_minimal() +
+        theme(legend.title = element_blank()) +
+  coord_fixed(ratio=1)
+
+yz_proj <- ggplot(data_xyz_45, aes(y, z, color=as.factor(article_corpus))) + 
+  geom_point(show.legend = FALSE) + 
+  scale_color_manual(values = c('#868686FF', '#EFC000FF', '#0073C2FF', '#CD534CFF')) +
+  theme(legend.position = "none") +
+  theme_minimal() +
+  coord_fixed(ratio=1)
+
+ggdraw() +
+  draw_plot(xy_proj, 0, 0.2, 1, 0.8) +
+  draw_plot(yz_proj, 0, 0, 1, .2) +
+  draw_plot_label(c("A", "B"), c(0, 0), c(1, 0.2))
+
+```
+
+```{r projection_types, cache = TRUE, echo = FALSE, message = FALSE, fig.height = 8, fig.cap="Plan view (A) and transect (B; Y-Z with 45° rotation of XY axis) of piece-plotted Mousterian and Châtelperronian lithics, shell beads and pigments from SU 18, 18/19 and 19. Bead = Shell bead; col_mat = Pigment; CP = Châtelperronian; MST = Mousterian \\label{projection_types}"}
+
+all_identified <- dplyr::select(data_xyz, x,y,z, nature)
+all_identified <- dplyr::filter(all_identified, nature != 'NA')
+all_identified = data.frame(x = all_identified$x, y = all_identified$y, z = all_identified$z, nature = all_identified$nature)
+
+all_identified_45 <- dplyr::select(data_xyz_45, x,y,z, nature)
+all_identified_45 <- dplyr::filter(all_identified_45, nature != 'NA')
+all_identified_45 = data.frame(x = all_identified_45$x, y = all_identified_45$y, z = all_identified_45$z, nature = all_identified_45$nature)
+
+xy_proj <- ggplot(all_identified,aes(x, y, color=nature)) + 
+  geom_point() + 
+  scale_color_manual(values = c('#EFC000FF', '#CD534CFF','#0073C2FF' ,'#868686FF')) +
+  theme(legend.position = c(1,1),
+        legend.justification = c("right", "top"),
+        legend.box.just = "right",
+        legend.margin = margin(6, 6, 6, 6)) +
+        theme_minimal() +
+        theme(legend.title = element_blank()) +
+  coord_fixed(ratio=1)
+
+yz_proj <- ggplot(all_identified_45, aes(y, z, color=nature)) + 
+  geom_point(show.legend = FALSE) + 
+  scale_color_manual(values = c('#EFC000FF', '#CD534CFF','#0073C2FF', '#868686FF')) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  coord_fixed(ratio=1)
+
+ggdraw() +
+  draw_plot(xy_proj, 0, 0.2, 1, 0.8) +
+  draw_plot(yz_proj, 0, 0, 1, .2) +
+  draw_plot_label(c("A", "B"), c(0, 0), c(1, 0.2))
+
+```
+
+```{r species_projection, cache = TRUE, echo=FALSE, message = FALSE, include = TRUE, fig.height = 7, fig.cap="Plan view (A) and transect (B; Y-Z with 45° rotation of XY axis) of piece-plotted elements of the five main species in the SU 18-19 faunal assemblage. BB = Bison; CAB = Horse; MTH = Mammoth; RANG = Reindeer; RHINO = Rhinoceros \\label{species_projection}"}
+
+# identified faunal remains for projections
+fauna <- dplyr::select(data_xyz, x, y, z, species)
+fauna <- dplyr::filter(fauna, species %in% c('BB', 'CAB', 'MTH', 'RANG', 'RHINO'))
+
+fauna_45 <- dplyr::select(data_xyz_45, x, y, z, species)
+fauna_45 <- dplyr::filter(fauna_45, species %in% c('BB', 'CAB', 'MTH', 'RANG', 'RHINO'))
+
+xy_fauna <- ggplot(fauna,aes(x, y, color=as.factor(species))) + 
+  geom_point() + 
+  scale_color_manual(values = c('#868686FF', '#EFC000FF', '#0073C2FF', '#CD534CFF', '#7AA6DCFF')) +
+  theme(legend.position = c(0,1),
+        legend.justification = c("right", "top"),
+        legend.box.just = "right",
+        legend.margin = margin(6, 6, 6, 6)) +
+        theme_minimal() +
+        theme(legend.title = element_blank()) +
+  coord_fixed(ratio=1)
+
+yz_fauna <- ggplot(fauna_45, aes(y, z, color=as.factor(species))) + 
+  geom_point(show.legend = FALSE) + 
+  scale_color_manual(values = c('#868686FF', '#EFC000FF', '#0073C2FF', '#CD534CFF', '#7AA6DCFF')) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  coord_fixed(ratio=1)
+
+ggdraw() +
+  draw_plot(xy_fauna, 0, 0.2, 1, 0.75) +
+  draw_plot(yz_fauna, 0, 0, 1, .25) +
+  draw_plot_label(c("A", "B"), c(0, 0), c(1, 0.2))
+
+
+```
+
+## Fabric analysis of archaeological remains
+
+When measurements from SU 18-19 are computed together, the point pattern in the Benn diagram stretches from the planar pole to an intermediate position between the planar (PL) and elongation (EL) poles (fig. S7-\ref{fig:fabric_analysis}A).
+Within this general pattern, three subgroups can be distinguished by a planar/isotropic “void” (between groups 2 and 3; fig. S7-\ref{fig:fabric_analysis}A) and planar/elongated “void” (between groups 1 and 2/3; fig. S7-\ref{fig:fabric_analysis}A).
+In plan view, these three subgroups are distributed downslope (group 1) and upslope (group 3), separated by a third, much more planar group (group 2).
+When data for each group is treated separately, group 1 is located between the planar and elongation poles of the Benn diagram (fig. S7-\ref{fig:fabric_analysis}C).
+A reject ratio (Tr) of 84 % confirming a strong preferential orientation of the remains along the main slope of the deposits (Table S7-1; fig. S7-\ref{fig:fabric_analysis}D and E) with a steep plunge (fig. S7-\ref{fig:fabric_analysis}F) consistent with the presence of a solifluction lobe with a stony front in the downslope excavated area (square J5; cf. Todisco, Mallol *et al.* 2023).
+The fabric of group 2 is more planar (fig. S7-\ref{fig:fabric_analysis}C and D) and displays no preferential orientation (Tr = 0 in Table S7-1; fig. S7-\ref{fig:fabric_analysis}D) but a slight plunge, characteristic of undisturbed lithic assemblage or shallow surface water runoff on a gentle slope.
+The fabric of the third group is more isotropic (fig. S7-\ref{fig:fabric_analysis}C) with no preferential orientation (Tr = 0 in Table S7-1) but a steeper plunge.
+This pattern could fit with objects deposited in a context of rock fall and/or bioturbated sediment.
+\bigbreak
+
+Table 1.
+Summary results of the fabric analysis
+
+```{r fab_stats, echo=FALSE, message = FALSE, include = FALSE}
+
+# summary statistics of each samples
+group1 <- data_fab %>% filter(group_fab =="1")
+group2 <- data_fab %>% filter(group_fab =="2")
+group3 <- data_fab %>% filter(group_fab =="3")
+
+# mean values of orientation (0-180°) tests on orientation
+group_1 <- data.frame(
+  group = "1",
+  n = nrow(group1),
+  IS = mean(data.frame(spatial_benn(group1))$isotropy),
+  EL = mean(data.frame(spatial_benn(group1))$elongation),
+  L = mean(spatial_bearing(group1)$L),
+  p_value = mean(spatial_bearing(group1)$p), 
+  Tr = sum(spatial_bearing(group1)$p <= 0.05)*100/nrow(group1))
+
+group_2 <- data.frame(
+  group = "2",
+  n = nrow(group2),
+  IS = mean(data.frame(spatial_benn(group2))$isotropy),
+  EL = mean(data.frame(spatial_benn(group2))$elongation),
+  L = mean(spatial_bearing(group2)$L),
+  p_value = mean(spatial_bearing(group2)$p), 
+  Tr = sum(spatial_bearing(group2)$p <= 0.05)*100/nrow(group2))
+
+group_3 <- data.frame(
+  group = "3",
+  n = nrow(group3),
+  IS = mean(data.frame(spatial_benn(group3))$isotropy),
+  EL = mean(data.frame(spatial_benn(group3))$elongation),
+  L = mean(spatial_bearing(group3)$L),
+  p_value = mean(spatial_bearing(group3)$p), 
+  Tr = sum(spatial_bearing(group3)$p <= 0.05)*100/nrow(group3))
+
+res_fab <- cbind(group = c("1", "2", "3"), round(rbind(group_1, group_2, group_3)[,2:7], 2))
+
+```
+
+```{r stats_fab_res, echo = FALSE, message = FALSE, warning =FALSE, caption="Summary statistics of the fabric analysis"}
+knitr::kable(res_fab, format="pandoc")
+```
+
+## Particle size distribution of the lithic remains
+
+Analysis of the particle size distribution by spit (2 cm thick), sub-square and stratigraphic unit shows a clear difference between units 18/19, 19 and unit 18.
+The SU 18 spits in the upslope (K4 III-IV, J4 III-IV) and downslope areas (K5 IV, K5 III-IV) tend to cluster in or near the zone of experimental reduction sequences in all the sub-squares (fig. S7-\ref{fig:granulo}).
+On the other hand, none of the SU 18 spits in the central band (K5 II-I, J5 I-II) fall within the zone of experimental reduction sequences due to the lack of pieces larger than 10 mm.
+
+The spits from SU 18/19 and 19 show a clear particle size sorting in favor of the smallest particles.
+This small-particle enrichment may reflect the mechanical alteration of the lithic edges, producing more small fragments.
+The low overall density of SU 18/19 and 19 and their particle size distribution are consistent with a downward migration of the smallest lithic elements during the accumulation of SU 18.
+The vertical “sieving” of the pieces between the limestone blocks of the solifluction lobe and the upward displacement of larger objects due to the action of ice lenses/frost heave (cryoexpulsion) could explain this pattern.
+For these reasons, the following spatial exploration only considers the remains included in SU 18.
+
+\blandscape
+
+```{r fabric_analysis, out.extra='angle=0', echo = FALSE, message=FALSE, fig.align='center', fig.cap='SU 18-19 fabrics: (A) Benn diagram of all measurements (combined SU); (B) Plan view with the three identified fabric groups; (C) Benn diagrams, (D) Schmidt diagrams, (E) Orientation rose diagrams, and (F) Plunge rose diagrams for each of the three groups', out.width='0.95\\linewidth'}
+knitr::include_graphics("./fig_def/fabric_analysis.pdf")
+```
+
+\elandscape
+
+
+```{r granulo, echo = FALSE, message=FALSE, fig.align='center', fig.cap='SU 18, 18/19, 19 artifact size distribution', out.width='0.9\\linewidth'}
+knitr::include_graphics("./fig_def/granulo_som.pdf")
+```
+
+```{r granulo_model_fig, echo=FALSE, message = FALSE, include = FALSE}
+
+# redo the experimental particle size distribution knapping model
+# data after Bertran et al 2012 data
+
+model_SC <- ggtern::ggtern(data = model_granulo, aes(n2, n10, n4)) +
+  ggplot2::geom_point(size = 1, fill = NA, colour = "black") +
+  ggtern::stat_confidence_tern(geom = "polygon", aes(fill = ..level.., alpha = 0.1), color = "white", size = 0.1) +
+  ggplot2::labs(title = "", fill = "Confidence", x = "2 mm", y = "10 mm", z = "4 mm") +
+  ggplot2::theme(
+    tern.axis.line.T = element_line(color = "black", size = 1),
+    tern.axis.line.L = element_line(color = "black", size = 1),
+    tern.axis.line.R = element_line(color = "black", size = 1)
+  ) +
+  ggtern::theme_bw() +
+  ggplot2::guides(alpha = "none", color = "none", fill = "none", size = 0.5) +
+  ggtern::scale_T_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.5), labels = c("", "", ""), minor_breaks = NULL, size = 0.5) +
+  ggtern::scale_L_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.5), labels = c("", "", ""), minor_breaks = NULL, size = 0.5) +
+  ggtern::scale_R_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.5), labels = c("", "", ""), minor_breaks = NULL, size = 0.5) +
+  ggtern::geom_Tline(Tintercept = 0.5, colour = "black", size = 0.2) +
+  ggtern::geom_Lline(Lintercept = 0.5, colour = "black", size = 0.2) +
+  ggtern::geom_Rline(Rintercept = 0.5, colour = "black", size = 0.2)
+
+model_SC
+```
+
+```{r granulo_som_fig, echo=FALSE, message = FALSE, include = FALSE}
+
+# create the ternary plots for each square with knapping experimental model comparison for SOM
+# we keep only the samples > 100 and non bioturbated areas
+granulo_sc <- data_granulo %>%
+  filter(sample_size == 'sup_50')
+
+# create the plots
+p <- ggtern::ggtern(data = model_granulo, aes(n2, n10, n4)) +
+  ggplot2::geom_point(size = 1, fill = NA, colour = "white") +
+  ggtern::stat_confidence_tern(geom = "polygon", aes(fill = ..level.., alpha = 0.1), color = "white", size = 0.1) +
+  ggplot2::labs(title = "", fill = "Confidence", x = "2", y = "10", z = "4") +
+  ggplot2::theme(
+    tern.axis.line.T = element_line(color = "black", size = 1),
+    tern.axis.line.L = element_line(color = "black", size = 1),
+    tern.axis.line.R = element_line(color = "black", size = 1)
+  ) +
+  ggtern::theme_bw() +
+  ggplot2::guides(alpha = "none", color = "none", fill = "none", size = 0.5) +
+  ggtern::scale_T_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.5), labels = c("", "", ""), minor_breaks = NULL, size = 0.5) +
+  ggtern::scale_L_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.5), labels = c("", "", ""), minor_breaks = NULL, size = 0.5) +
+  ggtern::scale_R_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.5), labels = c("", "", ""), minor_breaks = NULL, size = 0.5) +
+  ggtern::geom_Tline(Tintercept = 0.5, colour = "black", size = 0.2) +
+  ggtern::geom_Lline(Lintercept = 0.5, colour = "black", size = 0.2) +
+  ggtern::geom_Rline(Rintercept = 0.5, colour = "black", size = 0.2)
+
+p_SC <- p + ggplot2::geom_point(data = granulo_sc, aes(x = n2, y = n10, z = n4, colour = factor(sub_us)), pch = 19, size = 1) +
+  ggplot2::facet_grid(sub_square ~ square) +
+  ggplot2::theme(strip.background = element_rect(fill = "white")) +
+  scale_color_manual(values = c("red", "black", "grey"))
+  
+p_SC
+
+```
+
+```{r granulo_main_fig, echo=FALSE, message = FALSE, include = FALSE}
+
+# create a synthetic figure for main article
+# for lower layer part
+lower_part_SC <-  data_granulo %>%
+  filter(sub_us == 'bottom')
+
+lower_part_n2mm <- sum(lower_part_SC$n2)
+lower_part_n4mm <- sum(lower_part_SC$n4)
+lower_part_n10mm <- sum(lower_part_SC$n10)
+sample <- "lower_part"
+
+lower_part_counts <- data.frame(cbind(sample, lower_part_n2mm, lower_part_n4mm, lower_part_n10mm)) %>%
+  rename(n2mm = lower_part_n2mm) %>%
+  rename(n4mm = lower_part_n4mm) %>%
+  rename(n10mm = lower_part_n10mm)
+
+# for upper layer part 
+upper_part_SC <-  data_granulo %>%
+  filter(sub_us == 'top')
+
+upper_part_n2mm <- sum(upper_part_SC$n2)
+upper_part_n4mm <- sum(upper_part_SC$n4)
+upper_part_n10mm <- sum(upper_part_SC$n10)
+sample <- "upper_part"
+
+upper_part_counts <- data.frame(cbind(sample, upper_part_n2mm, upper_part_n4mm, upper_part_n10mm)) %>%
+  rename(n2mm = upper_part_n2mm) %>%
+  rename(n4mm = upper_part_n4mm) %>%
+  rename(n10mm = upper_part_n10mm)
+
+# for total
+total_n2mm <- sum(granulo_sc$n2)
+total_n4mm <- sum(granulo_sc$n4)
+total_n10mm <- sum(granulo_sc$n10)
+sample <- "total"
+
+total_counts <- data.frame(cbind(sample, total_n2mm, total_n4mm, total_n10mm)) %>%
+  rename(n2mm = total_n2mm) %>%
+  rename(n4mm = total_n4mm) %>%
+  rename(n10mm = total_n10mm)
+
+# gather everything
+synthetic_ternary <- rbind(lower_part_counts, upper_part_counts, total_counts)
+
+# create the ternary plot
+synthetic_SC <- ggtern::ggtern(data = model_granulo, aes(n2, n10, n4)) +
+  ggplot2::geom_point(size = 1, fill = NA, colour = "white") +
+  ggtern::stat_confidence_tern(geom = "polygon", aes(fill = ..level.., alpha = 0.1), color = "white", size = 0.1) +
+  ggplot2::labs(title = "", fill = "Confidence", x = "2 mm", y = "10 mm", z = "4 mm") +
+  ggplot2::theme(
+    tern.axis.line.T = element_line(color = "black", size = 1),
+    tern.axis.line.L = element_line(color = "black", size = 1),
+    tern.axis.line.R = element_line(color = "black", size = 1)
+  ) +
+  ggtern::theme_bw() +
+  ggplot2::guides(alpha = "none", color = "none", fill = "none", size = 0.5) +
+  ggtern::scale_T_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.5), labels = c("", "", ""), minor_breaks = NULL, size = 0.5) +
+  ggtern::scale_L_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.5), labels = c("", "", ""), minor_breaks = NULL, size = 0.5) +
+  ggtern::scale_R_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.5), labels = c("", "", ""), minor_breaks = NULL, size = 0.5) +
+  ggtern::geom_Tline(Tintercept = 0.5, colour = "black", size = 0.2) +
+  ggtern::geom_Lline(Lintercept = 0.5, colour = "black", size = 0.2) +
+  ggtern::geom_Rline(Rintercept = 0.5, colour = "black", size = 0.2)
+
+synthetic_SC <- p + ggplot2::geom_point(data = synthetic_ternary, aes(x = as.numeric(n2mm), y = as.numeric(n10mm), z = as.numeric(n4mm), colour = sample), pch = 19, size = 1) +
+  ggplot2::theme(strip.background = element_rect(fill = "white"))
+
+synthetic_SC
+
+```
+
+## Kernel density of plotted pieces per type
+
+The density analyses according to artifact type reveal three clear patterns:
+
+-   Mousterian lithics and bison bones cluster primarily in the upslope and downslope excavation areas (fig. S7-\ref{kernel});
+
+-   Châtelperronian lithics, shell beads and pigments all cluster in the same zone;
+
+-   The distribution of horse, rhinoceros and mammoth (also less numerous) is significantly more diffuse.
+
+```{r data_prep, echo = FALSE, warning = FALSE, message = FALSE, include  = FALSE}
+
+# data preparation
+moust <- dplyr::select(data_xyz_18, x, y, z, nature)
+moust <- dplyr::filter(moust, nature %in% c('MST'))
+
+chatel <- dplyr::select(data_xyz_18, x, y, z, nature)
+chatel <- dplyr::filter(chatel, nature %in% c('CP'))
+
+bead <- dplyr::select(data_xyz_18, x,y,z, nature)
+bead <- dplyr::filter(bead, nature %in% c('bead'))
+
+col_mat <- dplyr::select(data_xyz_18, x,y,z, nature)
+col_mat <- dplyr::filter(col_mat, nature %in% c('col_mat'))
+
+cab <- dplyr::select(data_xyz_18, x,y,z, species)
+cab <- dplyr::filter(cab, species == 'CAB')
+cab = data.frame(x = cab$x, y = cab$y, z = cab$z, nature = cab$species)
+
+rang <- dplyr::select(data_xyz_18, x,y,z, species, Bodypart)
+rang <- dplyr::filter(rang, species == 'RANG')
+rang = data.frame(x = rang$x, y = rang$y, z = rang$z, nature = rang$species)
+# rang_bis <- dplyr::filter(rang, Bodypart == '1.ANT')
+# rang_bis = data.frame(x = rang_bis$x, y = rang_bis$y, z = rang_bis$z, nature = rang_bis$species)
+
+bb <- dplyr::select(data_xyz_18, x,y,z, species)
+bb <- dplyr::filter(bb, species == 'BB')
+bb <- data.frame(x = bb$x, y = bb$y, z = bb$z, nature = bb$species)
+
+rhino <- dplyr::select(data_xyz_18, x,y,z, species)
+rhino <- dplyr::filter(rhino, species == 'RHINO')
+rhino <- data.frame(x = rhino$x, y = rhino$y, z = rhino$z, nature = rhino$species)
+
+mth <- dplyr::select(data_xyz_18, x,y,z, species)
+mth <- dplyr::filter(mth, species == 'MTH')
+mth <- data.frame(x = mth$x, y = mth$y, z = mth$z, nature = mth$species)
+
+#grande fenêtre échantillonnage pour générer les cartes de densité sur toute la surface de fouille
+w_big <- owin(poly=list(x=c(-12,-9.5,-9.5,-12),y=c(3.5,3.5,6.5,6.5)))
+
+#conversion des jeux de données en format ppp
+d_moust_ppp = ppp(moust$x, moust$y, w_big)
+d_chatel_ppp = ppp(chatel$x, chatel$y, w_big)
+d_bead_ppp = ppp(bead$x, bead$y, w_big)
+d_col_mat_ppp = ppp(col_mat$x, col_mat$y, w_big)
+
+d_cab_ppp = ppp(cab$x, cab$y, w_big)
+d_rang_ppp = ppp(rang$x, rang$y, w_big)
+d_bb_ppp = ppp(bb$x, bb$y, w_big)
+d_rhino_ppp = ppp(rhino$x, rhino$y, w_big)
+d_mth_ppp = ppp(mth$x, mth$y, w_big)
+
+```
+
+```{r kernel, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE, fig.height = 8.5, fig.cap="Kernel density by artifact type and the five main species of the SU 18 faunal assemblage \\label{kernel}"}
+
+par(mfrow = c(3,3))
+
+rw = 0.01
+sdev <- 3*mean(nndist(d_moust_ppp))
+dens_moust <- density(d_moust_ppp, sdev, eps=rw, edge=TRUE, at="pixels")
+plot(raster(dens_moust), col = grey.colors(25, start = 0.97, end = 0.4), main = "Mousterian",
+xlim=c(-12, -9.5), ylim=c(3.5, 6.5))
+contour(dens_moust, add=T)
+points(d_moust_ppp$x, d_moust_ppp$y, pch=20, cex = 0.2)
+
+sdev <- 3*mean(nndist(d_bb_ppp))
+dens_bb <- density(d_bb_ppp, sdev, eps=rw, edge=TRUE, at="pixels")
+plot(raster(dens_bb), col = grey.colors(25, start = 0.97, end = 0.4), main = "Bison",
+xlim=c(-12, -9.5), ylim=c(3.5, 6.5))
+contour(dens_bb, add=T)
+points(d_bb_ppp$x, d_bb_ppp$y, pch=20, cex = 0.2)
+
+sdev <- 3*mean(nndist(d_rang_ppp))
+dens_rang <- density(d_rang_ppp, sdev, eps=rw, edge=TRUE, at="pixels")
+plot(raster(dens_rang), col = grey.colors(25, start = 0.97, end = 0.4), main = "Reindeer",
+xlim=c(-12, -9.5), ylim=c(3.5, 6.5))
+contour(dens_rang, add=T)
+points(d_rang_ppp$x, d_rang_ppp$y, pch=20, cex = 0.2)
+
+sdev <- 3*mean(nndist(d_chatel_ppp))
+dens_chatel <- density(d_chatel_ppp, sdev, eps=rw, edge=TRUE, at="pixels")
+plot(raster(dens_chatel), col = grey.colors(25, start = 0.97, end = 0.4), main = "Châtelperronian", xlim=c(-12, -9.5), ylim=c(3.5, 6.5))
+contour(dens_chatel, add=T)
+points(d_chatel_ppp$x, d_chatel_ppp$y, pch=20, cex = 0.2)
+
+sdev <- 3*mean(nndist(d_bead_ppp))
+dens_bead <- density(d_bead_ppp, sdev, eps=rw, edge=TRUE, at="pixels")
+plot(raster(dens_bead), col = grey.colors(25, start = 0.97, end = 0.4), main = "Beads",
+xlim=c(-12, -9.5), ylim=c(3.5, 6.5))
+contour(dens_bead, add=T)
+points(d_bead_ppp$x, d_bead_ppp$y, pch=20, cex = 0.2)
+
+sdev <- 3*mean(nndist(d_col_mat_ppp))
+dens_col_mat <- density(d_col_mat_ppp, sdev, eps=rw, edge=TRUE, at="pixels")
+plot(raster(dens_col_mat), col = grey.colors(25, start = 0.97, end = 0.4), main = "Pigments",
+xlim=c(-12, -9.5), ylim=c(3.5, 6.5))
+contour(dens_col_mat, add=T)
+points(d_col_mat_ppp$x, d_col_mat_ppp$y, pch=20, cex = 0.2)
+
+sdev <- 3*mean(nndist(d_cab_ppp))
+dens_cab <- density(d_cab_ppp, sdev, eps=rw, edge=TRUE, at="pixels")
+plot(raster(dens_cab), col = grey.colors(25, start = 0.97, end = 0.4), main = "Horse",
+xlim=c(-12, -9.5), ylim=c(3.5, 6.5))
+contour(dens_cab, add=T)
+points(d_cab_ppp$x, d_cab_ppp$y, pch=20, cex = 0.2)
+
+sdev <- 3*mean(nndist(d_rhino_ppp))
+dens_rhino <- density(d_rhino_ppp, sdev, eps=rw, edge=TRUE, at="pixels")
+plot(raster(dens_rhino), col = grey.colors(25, start = 0.97, end = 0.4), main = "Rhinoceros",
+xlim=c(-12, -9.5), ylim=c(3.5, 6.5))
+contour(dens_rhino, add=T)
+points(d_rhino_ppp$x, d_rhino_ppp$y, pch=20, cex = 0.2)
+
+sdev <- 3*mean(nndist(d_mth_ppp))
+dens_mth <- density(d_mth_ppp, sdev, eps=rw, edge=TRUE, at="pixels")
+plot(raster(dens_mth), col = grey.colors(25, start = 0.97, end = 0.4), main = "Mammoth",
+xlim=c(-12, -9.5), ylim=c(3.5, 6.5))
+contour(dens_mth, add=T)
+points(d_mth_ppp$x, d_mth_ppp$y, pch=20, cex = 0.2)
+
+```
+
+## Spatial dependency of plotted remains within types (Ripley's K, homogeneous and inhomogeneous functions)
+
+Ripley's homogeneous K function shows aggregated structures for each type (fig. S7-\ref{kest}).
+However, the inhomogeneous functions show structures compatible with Poisson processes except for the Moustrian lithic remains and bison bones, which show attractive links below a radius of 0.3 to 0.4 metres (fig. S7-\ref{kinhom}).
+The results return by the inhomogeneous function for the other types are compatible with a CSR pattern and could be due to smaller sample sizes.
+
+```{r kest, echo = FALSE, cache = TRUE, warning = FALSE, results = FALSE, message = FALSE, include  = TRUE, fig.height = 8.5, fig.cap="Result of the Ripley's K 'homogeneous' function by artifact type \\label{kest}"}
+
+# moust_hom <- homtest(d_moust_ppp)$p.value
+# chatel_hom <- homtest(d_chatel_ppp)$p.value
+# bead_hom <- homtest(d_bead_ppp)$p.value
+# col_mat_hom <- homtest(d_col_mat_ppp)$p.value
+# rang_hom <- homtest(d_rang_ppp)$p.value
+# cab_hom <- homtest(d_cab_ppp)$p.value
+# bb_hom <- homtest(d_bb_ppp)$p.value
+
+# do the point pattern structure tests
+par(mfrow=c(3,3))
+plot(spatstat.explore::envelope(d_moust_ppp, Kest, correction = "isotropic"), main = "Mousterian")
+plot(spatstat.explore::envelope(d_rang_ppp, Kest, correction = "isotropic"), main = "Reindeer")
+plot(spatstat.explore::envelope(d_bb_ppp, Kest, correction = "isotropic"), main = "Bison")
+plot(spatstat.explore::envelope(d_chatel_ppp, Kest, correction = "isotropic"), main = "Chatelperronian")
+plot(spatstat.explore::envelope(d_bead_ppp, Kest, correction = "isotropic"), main = "Beads")
+plot(spatstat.explore::envelope(d_col_mat_ppp, Kest, correction = "isotropic"), main = "Pigments")
+plot(spatstat.explore::envelope(d_cab_ppp, Kest, correction = "isotropic"), main = "Horse")
+
+```
+
+```{r kinhom, echo = FALSE, cache = TRUE, warning = FALSE, results = FALSE, message = FALSE, include  = TRUE, fig.height = 8.5, fig.cap="Result of the Ripley's K 'inhomogeneous' function by artifact type \\label{kinhom}"}
+
+# moust_hom <- homtest(d_moust_ppp)$p.value
+# chatel_hom <- homtest(d_chatel_ppp)$p.value
+# bead_hom <- homtest(d_bead_ppp)$p.value
+# col_mat_hom <- homtest(d_col_mat_ppp)$p.value
+# rang_hom <- homtest(d_rang_ppp)$p.value
+# cab_hom <- homtest(d_cab_ppp)$p.value
+# bb_hom <- homtest(d_bb_ppp)$p.value
+
+# do the point pattern structure tests
+par(mfrow=c(3,3))
+plot(spatstat.explore::envelope(d_moust_ppp, Kinhom, correction = "isotropic"), main = "Mousterian")
+plot(spatstat.explore::envelope(d_rang_ppp, Kinhom, correction = "isotropic"), main = "Reindeer")
+plot(spatstat.explore::envelope(d_bb_ppp, Kinhom, correction = "isotropic"), main = "Bison")
+plot(spatstat.explore::envelope(d_chatel_ppp, Kinhom, correction = "isotropic"), main = "Chatelperronian")
+plot(spatstat.explore::envelope(d_bead_ppp, Kinhom, correction = "isotropic"), main = "Beads")
+plot(spatstat.explore::envelope(d_col_mat_ppp, Kinhom, correction = "isotropic"), main = "Pigments")
+plot(spatstat.explore::envelope(d_cab_ppp, Kinhom, correction = "isotropic"), main = "Horse")
+
+```
+
+## Spatial dependency between plotted remains according to type (Ripley's K intertype, homogeneous function)
+
+When the spatial dependency between remains types are tested (fig. S7-\ref{kcross}), it appears that :
+
+-   chatelperronian lithics versus shell beads, chatelperronian lithics versus pigments and shell beads versus pigments are all spatially associated two by two.
+
+-   mousterian lithics versus beads, mousterian lithics versus pigments and mousterian lithics versus chatelperronian lithics show no spatial dependency.
+
+```{r kcross, echo = FALSE, cache = TRUE, warning = FALSE, results = FALSE, message = FALSE, fig.height = 8.5, fig.cap="Results of the Ripley intertype tests by artifact type (homogeneous function) \\label{kcross}"}
+
+# data preparation
+chatel_n_bead = rbind(bead, chatel)
+chatel_n_col_mat = rbind(col_mat, chatel)
+moust_n_bead = rbind(bead, moust)
+moust_n_col_mat = rbind(col_mat, moust)
+moust_n_chatel = rbind(chatel, moust)
+bead_n_col_mat = rbind(bead, col_mat)
+
+
+# sampling window
+w <- owin(poly=list(x=c(-11.78,-10.22,-10.22,-11.78),y=c(4.45,4.45,6,6)))
+
+# conversion to ppp objects
+chatel_n_bead_ppp = ppp(chatel_n_bead$x, chatel_n_bead$y, w, marks = as.factor(chatel_n_bead$nature))
+moust_n_bead_ppp = ppp(moust_n_bead$x, moust_n_bead$y, w, marks = as.factor(moust_n_bead$nature))
+moust_n_chatel_ppp = ppp(moust_n_chatel$x, moust_n_chatel$y, w, marks = as.factor(moust_n_chatel$nature))
+chatel_n_col_mat_ppp = ppp(chatel_n_col_mat$x, chatel_n_col_mat$y, w, marks = as.factor(chatel_n_col_mat$nature))
+moust_n_col_mat_ppp = ppp(moust_n_col_mat$x, moust_n_col_mat$y, w, marks = as.factor(moust_n_col_mat$nature))
+bead_n_col_mat_ppp = ppp(bead_n_col_mat$x, bead_n_col_mat$y, w, marks = as.factor(bead_n_col_mat$nature))
+
+# homtest(bead_n_col_mat_ppp)$p.value
+
+# redo the Kcross tests
+par(mfrow = c(2,3))
+plot(spatstat.explore::envelope(moust_n_bead_ppp, Kcross, correction = "isotropic"), main = "Mousterian/beads")
+plot(spatstat.explore::envelope(moust_n_col_mat_ppp, Kcross, correction = "isotropic"), main = "Mousterian/pigment")
+plot(spatstat.explore::envelope(moust_n_chatel_ppp, Kcross, correction = "isotropic"), main = "Mousterian/Chatelperronian")
+plot(spatstat.explore::envelope(chatel_n_bead_ppp, Kcross, correction = "isotropic"), main = "Chatelperronian/beads")
+plot(spatstat.explore::envelope(chatel_n_col_mat_ppp, Kcross, correction = "isotropic"), main = "Chatelperronian/pigment")
+plot(spatstat.explore::envelope(bead_n_col_mat_ppp, Kcross, correction = "isotropic"), main = "bead/pigment")
+
+```
+
+```{r test_corr_intensite, cache = TRUE, echo = FALSE, include = FALSE, warning = FALSE, results = FALSE, message = FALSE, fig.height = 8.5}
+
+chatel_n_bead_ppp = ppp(chatel_n_bead$x, chatel_n_bead$y, w_big, marks = as.factor(chatel_n_bead$nature))
+
+moust_n_bead_ppp = ppp(moust_n_bead$x, moust_n_bead$y, w_big, marks = as.factor(moust_n_bead$nature))
+
+bead_n_col_mat_ppp = ppp(bead_n_col_mat$x, bead_n_col_mat$y, w_big, marks = as.factor(bead_n_col_mat$nature))
+
+
+
+# lambda_chatel <- density.ppp(d_chatel_ppp, sigma = bw.diggle(d_chatel_ppp))
+# lambda_moust <- density.ppp(d_moust_ppp, sigma = bw.diggle(d_moust_ppp))
+# lambda_bead <- density.ppp(d_bead_ppp, sigma = bw.diggle(d_bead_ppp))
+# 
+# plot(Kcross(chatel_n_bead_ppp, i = "CP", j = "bead", lambdaI = lambda_chatel, lambdaJ = lambda_bead, correction = "isotropic"))
+# 
+# plot(Kcross(moust_n_bead_ppp, i = "MST", j = "bead", lambdaI = lambda_moust, lambdaJ = lambda_bead, correction = "isotropic"))
+
+# mean(nndist(d_chatel_ppp))
+
+
+# déterminer si homogène ou inhomogène.
+# AIC la plus basse donne le meilleur modèle.
+# test_hom <- ppm(d_col_mat_ppp ~ 1)
+# test_inhom <- ppm(d_col_mat_ppp ~ x + y)
+# 
+# AIC(test_hom)
+# AIC(test_inhom)
+# 
+# 
+# 
+# # test ppm
+# chatel_bead_ppm_hom <- ppm(chatel_n_bead_ppp ~ marks)
+# chatel_bead_ppm_inhom <- ppm(chatel_n_bead_ppp ~ marks + x + y)
+# 
+# AIC(chatel_bead_ppm_hom)
+# AIC(chatel_bead_ppm_inhom)
+
+# AIC inhom est meilleur (+ faible), cela signifie que la localisation spatiale joue un rôle déterminant dans la distribution des marques (préférence spatiale). L'intensité du processus ponctuel dépend des marques et de la position spatiale.
+
+# moust_bead_ppm_hom <- ppm(moust_n_bead_ppp ~ marks)
+# moust_bead_ppm_inhom <- ppm(moust_n_bead_ppp ~ marks + x + y)
+# 
+# AIC(moust_bead_ppm_hom)
+# AIC(moust_bead_ppm_inhom)
+# 
+# pigment_bead_ppm_hom <- ppm(bead_n_col_mat_ppp ~ marks)
+# pigment_bead_ppm_inhom <- ppm(bead_n_col_mat_ppp ~ marks + x + y)
+# 
+# AIC(pigment_bead_ppm_hom)
+# AIC(pigment_bead_ppm_inhom)
+
+
+```
+
+## Spatial dependency between plotted remains according to type (Ripley's K intertype, inhomogeneous function)
+
+When applied to the same pairs of remains, the inhomogeneous Ripley's K intertype function show no particular pattern (fig. S7-\ref{kcross_inhom} ; this test appears unsatisfactory and return unreadable graphs).
+The spatial dependence (homogeneous intertype K function) between Châtelperronian lithic remains, shell beads and pigments could be caused by both first-order property and the second-order property.
+An interesting result is the lack of spatial dependence for the same test for pairs of Mousterian lithic remains, shell beads and pigments for this smaller observation window.
+However, due to the heterogeneity of the point pattern, a larger window would give all associated types two by two.
+The approximately 1.50 square metre window used for the Chatelperronian lithics, shell beads and pigments pair test could reflect the size of an area of technical activity.
+
+```{r kcross_inhom, echo=FALSE, cache = TRUE, message = FALSE, warning = TRUE, results = FALSE, include = TRUE, fig.height = 8.5, fig.cap="Results of the Ripley intertype tests by artifact type (inhomogeneous function) \\label{kcross_inhom}"}
+
+# unsatisfactory test. Unreadable graphs.
+# conversion to ppp objects
+chatel_n_bead_ppp = ppp(chatel_n_bead$x, chatel_n_bead$y, w_big, marks = as.factor(chatel_n_bead$nature))
+moust_n_bead_ppp = ppp(moust_n_bead$x, moust_n_bead$y, w_big, marks = as.factor(moust_n_bead$nature))
+moust_n_chatel_ppp = ppp(moust_n_chatel$x, moust_n_chatel$y, w_big, marks = as.factor(moust_n_chatel$nature))
+chatel_n_col_mat_ppp = ppp(chatel_n_col_mat$x, chatel_n_col_mat$y, w_big, marks = as.factor(chatel_n_col_mat$nature))
+moust_n_col_mat_ppp = ppp(moust_n_col_mat$x, moust_n_col_mat$y, w_big, marks = as.factor(moust_n_col_mat$nature))
+bead_n_col_mat_ppp = ppp(bead_n_col_mat$x, bead_n_col_mat$y, w_big, marks = as.factor(bead_n_col_mat$nature))
+
+par(mfrow = c(2,3))
+plot(spatstat.explore::envelope(moust_n_bead_ppp, Kcross.inhom, correction = "isotropic"), main = "Mousterian/beads")
+plot(spatstat.explore::envelope(moust_n_col_mat_ppp, Kcross.inhom, correction = "isotropic"), main = "Mousterian/pigment")
+plot(spatstat.explore::envelope(moust_n_chatel_ppp, Kcross.inhom, correction = "isotropic"), main = "Mousterian/Chatelperronian")
+plot(spatstat.explore::envelope(chatel_n_bead_ppp, Kcross.inhom, correction = "isotropic"), main = "Chatelperronian/beads")
+plot(spatstat.explore::envelope(chatel_n_col_mat_ppp, Kcross.inhom, correction = "isotropic"), main = "Chatelperronian/pigment")
+plot(spatstat.explore::envelope(bead_n_col_mat_ppp, Kcross.inhom, correction = "isotropic"), main = "bead/pigment")
+
+
+```
+
+## Spatial links between plotted remains according to lithic cultural attributions and species (Ripley's K intertype homogeneous)
+
+The Ripley’s K intertype test for spatial associations between the two SU 18 chrono-cultural components and the five main species demonstrates (fig. S7-\ref{kcross_CP_species} and fig. S7-\ref{kcross_moust_species}):
+
+-   Mousterian lithics to be associated with bison remains;
+
+-   Châtelperronian lithics not to be associated with any particular species.
+
+```{r kcross_CP_species, cache = TRUE, echo=FALSE, message = FALSE, warning = FALSE, results = FALSE, include = TRUE, fig.height = 8.5, fig.cap="Results of the Ripley intertype (homogeneous) tests between Châtelperronian lithics and five major faunal species \\label{kcross_CP_species}"}
+
+# data preparation
+chatel_n_bb = rbind(chatel, bb)
+chatel_n_cab = rbind(chatel, cab)
+chatel_n_mth = rbind(chatel, mth)
+chatel_n_rang = rbind(chatel, rang)
+chatel_n_rhino = rbind(chatel, rhino)
+# chatel_n_rang_ant = rbind(chatel, rang_bis)
+
+moust_n_bb = rbind(moust, bb)
+moust_n_cab = rbind(moust, cab)
+moust_n_mth = rbind(moust, mth)
+moust_n_rang = rbind(moust, rang)
+moust_n_rhino = rbind(moust, rhino)
+# moust_n_rang_ant = rbind(moust, rang_bis)
+
+# sampling window (where chatelperronian is located)
+w <- owin(poly=list(x=c(-11.78,-10.22,-10.22,-11.78),y=c(4.45,4.45,6,6)))
+
+# conversion to ppp objects
+chatel_n_bb_ppp = ppp(chatel_n_bb$x, chatel_n_bb$y, w, marks = as.factor(chatel_n_bb$nature))
+chatel_n_cab_ppp = ppp(chatel_n_cab$x, chatel_n_cab$y, w, marks = as.factor(chatel_n_cab$nature))
+chatel_n_mth_ppp = ppp(chatel_n_mth$x, chatel_n_mth$y, w, marks = as.factor(chatel_n_mth$nature))
+chatel_n_rang_ppp = ppp(chatel_n_rang$x, chatel_n_rang$y, w, marks = as.factor(chatel_n_rang$nature))
+chatel_n_rhino_ppp = ppp(chatel_n_rhino$x, chatel_n_rhino$y, w, marks = as.factor(chatel_n_rhino$nature))
+# chatel_n_rang_ant_ppp = ppp(chatel_n_rang_ant$x, chatel_n_rang_ant$y, w, marks = as.factor(chatel_n_rang_ant$nature))
+
+moust_n_bb_ppp = ppp(moust_n_bb$x, moust_n_bb$y, w, marks = as.factor(moust_n_bb$nature))
+moust_n_cab_ppp = ppp(moust_n_cab$x, moust_n_cab$y, w, marks = as.factor(moust_n_cab$nature))
+moust_n_mth_ppp = ppp(moust_n_mth$x, moust_n_mth$y, w, marks = as.factor(moust_n_mth$nature))
+moust_n_rang_ppp = ppp(moust_n_rang$x, moust_n_rang$y, w, marks = as.factor(moust_n_rang$nature))
+moust_n_rhino_ppp = ppp(moust_n_rhino$x, moust_n_rhino$y, w, marks = as.factor(moust_n_rhino$nature))
+# moust_n_rang_ant_ppp = ppp(moust_n_rang_ant$x, moust_n_rang_ant$y, w, marks = as.factor(moust_n_rang_ant$nature))
+
+# redo the Kcross intertype tests between CP lithics and species
+# Kcross function
+par(mfrow = c(2,3))
+plot(spatstat.explore::envelope(chatel_n_bb_ppp, Kcross, correction = "isotropic", fix.marks = TRUE), main = "Chatelperronian/Bison")
+plot(spatstat.explore::envelope(chatel_n_cab_ppp, Kcross, correction = "isotropic", fix.marks = TRUE), main = "Chatelperronian/Horse")
+plot(spatstat.explore::envelope(chatel_n_mth_ppp, Kcross, correction = "isotropic", fix.marks = TRUE), main = "Chatelperronian/Mammoth")
+plot(spatstat.explore::envelope(chatel_n_rang_ppp, Kcross, correction = "isotropic", fix.marks = TRUE), main = "Chatelperronian/Reindeer")
+plot(spatstat.explore::envelope(chatel_n_rhino_ppp, Kcross, correction = "isotropic", fix.marks = TRUE), main = "Chatelperronian/Rhinoceros")
+# plot(envelope(chatel_n_rang_ant_ppp, Kcross, correction = "isotropic", fix.marks = TRUE), main = "Chatelperronian/Rang antler")
+# plot(envelope(moust_n_rang_ant_ppp, Kcross, correction = "isotropic", fix.marks = TRUE), main = "Mousterian/Rang antler")
+
+```
+
+```{r kcross_moust_species, cache = TRUE, echo=FALSE, message = FALSE, warning = FALSE, results = FALSE, include = TRUE, fig.height = 8.5, fig.cap="Results of the Ripley intertype (homogeneous) tests between Mousterian lithics and five major animal species  \\label{kcross_moust_species}"}
+
+# redo the Kcross intertype tests between mousterian lithics ans species
+par(mfrow = c(2,3))
+plot(spatstat.explore::envelope(moust_n_bb_ppp, Kcross, correction = "isotropic", fix.marks = TRUE), main = "Mousterian/Bison")
+plot(spatstat.explore::envelope(moust_n_cab_ppp, Kcross, correction = "isotropic", fix.marks = TRUE), main = "Mousterian/Horse")
+plot(spatstat.explore::envelope(moust_n_mth_ppp, Kcross, correction = "isotropic", fix.marks = TRUE), main = "Mousterian/Mammoth")
+plot(spatstat.explore::envelope(moust_n_rang_ppp, Kcross, correction = "isotropic", fix.marks = TRUE), main = "Mousterian/Reindeer")
+plot(spatstat.explore::envelope(moust_n_rhino_ppp, Kcross, correction = "isotropic", fix.marks = TRUE), main = "Mousterian/Rhinoceros")
+
+
+
+```
+
+## Spatial analysis of lithic surface states
+
+The results of the fabric and Kernel density analysis suggest the two main clusters of Mousterian lithics and the accumulation of Châtelperronian lithics result from distinct site formation processes that might be reflected in the preservation of the material (fig. S7-\ref{lithic_surf_state_projection}).
+To test this, the two Mousterian clusters were distinguished (fig. S7-\ref{moust_sep_clusters}) using the ‘dbscan’ algorithm that groups points according to their density and eliminates outliers as noise (Ester *et al.* 1996).
+The preservation of the lithics comprising these two groups was subsequently compared to that of the Châtelperronian component (fig. S7-\ref{barplots_lithic_states}).
+The Mousterian lithics in cluster 1 concentrate in the downslope area of the excavated surface (square J5) and are generally well preserved (fig. S7-\ref{moust_sep_clusters} and S7-\ref{barplots_lithic_states}; around 50 % of the lithics belong to type 1 surface alterations, few to types 3 or 4).
+This pattern is in good agreement with slow movements over short distances such as those due to solifluction.
+Moreover, the cluster 1 lithics are spatially coincident with fabric group 1 (see fig. S7-\ref{barplots_lithic_states} above).
+Châtelperronian lithics, on the other hand, are generally well preserved, consistent with limited disturbance.
+Finally, the cluster 2 Mousterian material is substantially less well preserved, with more than 50 % of them belonging to type 3 and including significantly more type 4 pieces.
+Concentrating upslope, at the base of the limestone cliff and towards the summit of SU 18, the composition of this cluster likely reflects the combined action of rock fall connected to the retreat of the cliff and collapse of the overhang, longer artifact transport distances, and the introduction of material from above the cliff.
+The latter would be consistent with the high number of iron-stained geofacts originating from flint-bearing alterites above the site.
+
+```{r lithic_surf_state_projection, cache = TRUE, fig.cap="Plan view (A) and transect following the primary slope of the deposits (B; Y-Z with 45° rotation of XY axis) of the lithic surface alterations \\label{lithic_surf_state_projection}", echo = FALSE, message = FALSE, fig.height = 6}
+
+data_xyz_ls <- data_xyz %>%
+  filter(surface_state_class != 'NA')
+
+data_xyz_45_ls <- data_xyz_45 %>%
+  filter(surface_state_class != 'NA')
+  
+
+xy_proj <- ggplot(data_xyz_ls,aes(x, y, color=as.factor(surface_state_class))) + 
+  geom_point() + 
+  scale_color_manual(values = c('grey90', 'lightgrey','darkgrey', 'grey28', 'black')) +
+  theme(legend.position = c(1,1),
+        legend.justification = c("right", "top"),
+        legend.box.just = "right",
+        legend.margin = margin(6, 6, 6, 6)) +
+        theme_minimal() +
+        theme(legend.title = element_blank()) +
+  coord_fixed(ratio=1)
+
+yz_proj <- ggplot(data_xyz_45_ls, aes(y, z, color=as.factor(surface_state_class))) + 
+  geom_point(show.legend = FALSE) + 
+  scale_color_manual(values = c('grey90', 'lightgrey', 'darkgrey', 'grey28', 'black')) +
+  theme(legend.position = "none") +
+  theme_minimal() +
+  coord_fixed(ratio=1)
+
+ggdraw() +
+  draw_plot(xy_proj, 0, 0.2, 1, 0.8) +
+  draw_plot(yz_proj, 0, 0, 1, .2) +
+  draw_plot_label(c("A", "B"), c(0, 0), c(1, 0.2))
+
+```
+
+```{r moust_sep_clusters, echo = FALSE, warning = FALSE, results = FALSE, message = FALSE, fig.height = 4, fig.cap="Separation of the two clusters of Mousterian lithic remains using the ‘dbscan’ algorithm \\label{moust_sep_clusters}", fig.height  = 3}
+
+#les 2 clusters de moust font une soixantaine de cm  de diamètre et regroupent une 30aine de points
+#on demande à l'algo dbscan de chercher 2 clusters dans cet ordre d'idée
+
+db_moust <- dplyr::select(data_xyz_18, x, y, z, nature, surface_state_class)
+db_moust <- dplyr::filter(db_moust, nature == 'MST')
+db_moust <- dplyr::filter(db_moust, surface_state_class != 'NA')
+
+db_mouste <- db_moust[,1:2]
+
+res_moust <- dbscan::dbscan(db_mouste, 0.35, 35)
+fviz_cluster(res_moust, db_mouste, stand = FALSE, ellipse.type = "t", geom = "point", main = "", shape = "circle") +
+  labs(x = "x", y = "y") +
+  coord_fixed(ratio=1) +
+  theme_minimal()
+
+
+```
+
+```{r barplots_lithic_states, echo = FALSE, warning = FALSE, results = FALSE, message = FALSE, fig.cap="Surface alterations of the lithic remains by techno-complex (MST = Mousterian; CP = Châtelperronian). Type 0 = fresh, unlustred surfaces, intact edges and ridges; Type 1 = slightly lustred surfaces, relatively well-preserved ridges, intact edges; Type 3 = lustred surfaces, relatively well-preserved ridges, at least one edge bearing mechanical, often alternate edge damage; Type 4 =  heavily lustred surfaces with multiple edges bearing highly abrupt, often alternate mechanical damage, sometimes associated with macroscopic crushing \\label{barplots_lithic_states}", fig.height = 3}
+
+res_clust_moust <- data.frame(x = db_moust$x, y = db_moust$y, z = db_moust$z, acc = db_moust$nature, alt_lithiq = db_moust$surface_state_class, cluster = res_moust$cluster)
+
+
+alt_clust1 <- dplyr::select(res_clust_moust, acc, alt_lithiq, cluster)
+alt_clust1 <- dplyr::filter(res_clust_moust, cluster == '1')
+
+alt_clust1_2 <- alt_clust1 %>% 
+  count(alt_lithiq) %>% 
+  mutate(perc = n / nrow(alt_clust1))
+
+
+alt_clust2 <- dplyr::select(res_clust_moust, acc, alt_lithiq, cluster)
+alt_clust2 <- dplyr::filter(res_clust_moust, cluster == '2')
+
+alt_clust2_2 <- alt_clust2 %>% 
+  count(alt_lithiq) %>% 
+  mutate(perc = n / nrow(alt_clust2))
+
+alt_chatel <- dplyr::select(data_xyz_18, nature, surface_state_class)
+alt_chatel <- dplyr::filter(alt_chatel, surface_state_class != 'NA')
+alt_chatel <- dplyr::filter(alt_chatel, nature == 'CP')
+
+alt_chatel2 <- alt_chatel %>% 
+  count(surface_state_class) %>% 
+  mutate(perc = n / nrow(alt_chatel))
+
+plot_clust1 <- ggplot(alt_clust1_2, aes(x = alt_lithiq, y = perc)) + geom_bar(stat = "identity") +
+  xlab("") + ylab("%") + scale_y_continuous(breaks=seq(0,0.55,0.1), limits = c(0, 0.55))
+
+plot_clust2 <- ggplot(alt_clust2_2, aes(x = alt_lithiq, y = perc)) + geom_bar(stat = "identity") +
+  xlab("") + ylab("%") + scale_y_continuous(breaks=seq(0,0.55,0.1), limits = c(0, 0.55))
+
+plot_chatel2 <- ggplot(alt_chatel2, aes(x = surface_state_class, y = perc)) + geom_bar(stat = "identity") +
+  xlab("") + ylab("%") + scale_y_continuous(breaks=seq(0,0.55,0.1), limits = c(0, 0.55))
+
+ggdraw() +
+  draw_plot(plot_clust1, 0, 0.4, 0.47, 0.47) +
+  draw_plot(plot_clust2, 0.5, 0.4, 0.47, 0.47) +
+  draw_plot(plot_chatel2, 0.25, 0, 0.47, 0.47) +
+  draw_plot_label(c("MST cluster 1", "MST cluster 2", "CP"), c(0.05, 0.55, 0.1), c(1, 1, 0.32), size = 15)
+
+```
+
+## Systematic conjoining of lithic fragments from SU 18-19
+
+For the SU 18-19 lithic assemblage, 363 fragments out of a total of 865 were selected according to the criteria described above (breakage greater than 15 mm long and thickness greater than 5 mm): 149 proximal fragments, 95 mesial fragments, and 119 distal fragments.
+In terms of chrono-cultural attribution, the sample comprises primarily indeterminate fragments (80.7 %, n = 193), followed by those attributable to the Mousterian (15.9 %, n = 58) and Châtelperronian fragments (3.3 %, n = 12).
+In the end, the conjoining program produced seven connections out of a possible 52,121, giving a P value of 1.92 %, equivalent to that obtained for Lévêque’s EJOP sup / EJOP (Gravina *et al.* 2018).
+The connections concern six fragments attributed to the Mousterian, two to the Châtelperronian, and six indeterminate fragments.
+
+This extremely low success rate is highly unlikely to reflect techno-economic choices of the groups responsible for the SU 18-19 assemblage.
+Instead, it is better interpreted as resulting from the incorporation of archaeological material unrelated to the occupation of the collapsed rockshelter into a partially soliflucted stratigraphic unit that equally underwent some degree of gravitational sorting (movement of pieces downslope and out of the excavation window) in the context of an open-air slope deposit reworked under periglacial conditions.
+The fact that several of the conjoined pieces exhibit lustred surfaces combined with breaks or steep mechanical edge damage with double patinas would be consistent with at least two phases of artifact transport.
+
+# A model for the formation of SU 18-19
+
+The different lines of evidence outlined above, combined with geoarchaeological information (Todisco, Mallol *et al.* 2023), allow a hypothetical formation history for SU 18 and 19 to be proposed (Fig. 4 in main text) :
+
+-   *Phase 1* : Initial Mousterian occupation of the collapsed rock-shelter and overlying plateau.
+An initial Mousterian (Discoid and/or Levallois) occupation took place at the base of the limesone cliff on the collapsed rock-shelter and overlying slopes (*cf.* SOM 3) with an emphasis on the processing of bison carcasses.
+    These occupations were contemporaneous with the activity of the stone-banked solifluction lobe whose front developed in square J5 (Todisco, Maillol *et al.* 2023; fabric analysis, group 1).
+    Larger objects were moved upwards to the surface due to the action of ice heave (cryoexpulsion) and remobilized with other similarly sized pieces downslope, forming the semi-circular stony front of the lobe.
+    These processes ultimately resulted in a higher density of material in the distal excavated area.
+    Simultaneously, smaller objects were down-sorted between the reworked rock fall deposit.
+    Despite this remobilization, the lithic material from phase 1 is relatively well preserved.
+
+-   *Phase 2* : A brief Châtelperronian stop-over on a reworked Mousterian substrate.
+Once the solifluction lobe was inactive a nd fossilized, Châtelperronian groups set up a very localized area of technical activity, primarily in square K5, which included the maintenance of stone tools (*cf.* SOM 3) and the manufacture of shell beads as well as ocher use. This likely short occupation, typical of this techno-complex (Bachellerie 2011), cannot be reliably associated with any particular faunal species, which, of course, does not rule out Châtelperronian groups carrying out subsistence activities on-site. During this phase, sedimentation is primarily dominated by shallow surface runoff (low energy flow) resulting in relatively good preservation of the lithic surfaces and relatively unaltered spatial associations between different artifact types. Limited transport of the highly mobile shell beads is, however, evidenced by their being wedged against the limestone blocks in SU 18.
+
+-   *Phase 3* : Abandonment of the rock-shelter and introduction of exogenous artifacts.
+Mousterian lithics and faunal remains (primarily bison) abandoned on the portion above the site (top of the cliff) during the phase 1 occupation are introduced into the shelter via the expanding diaclase. These processes are reflected in the heavily altered surfaces of the lithic material clustered towards the base of the cliff and at the summit of SU 18, where they become mixed with material from phases 1 and 2. This exogenous input is further reinforced by the arrival of fine-grained sediments (such as clay, silt, sand) from the slopes above the cliff and the presence of numerous geofacts at the top of SU 18 (Todisco, Mallol *et al.* 2023).
+    
+\pagebreak
+
+# Bibliography
+
+BACHELLERIE F.
+(2011) ‒ Quelle unité pour le Châtelperronien?:
+apport de l’analyse taphonomique et techno-économique des industries lithiques de trois gisements aquitains de plein air: le Basté, Bidart (Pyrénées-Atlantiques) et Canaule II (Dordogne), PhD Thesis, Bordeaux 1
+
+BADDELEY A., RUBAK E., TURNER R. (2015) - Spatial Point Patterns: Methodology and Applications with R. Chapman and Hall/CRC Press, London. ISBN 9781482210200, https://www.routledge.com/Spatial-Point-Patterns-Methodology-and-Applications-with-R/Baddeley-Rubak-Turner/p/book/9781482210200/.
+
+BERTRAN P., CLAUD É., DETRAIN L., LENOBLE A., MASSON B., VALLIN L.
+(2006) ‒ Composition granulométrique des assemblages lithiques.
+Application à l’étude taphonomique des sites paléolithiques, PALEO.
+Revue d’archéologie préhistorique, , 18, p. 7‑36.
+
+BERTRAN P. dir. (2004) ‒ Dépôts de pente continentaux, dynamique et faciès, Quaternaire (Paris), 441p.
+
+BERTRAN P., LENOBLE A.
+(2002) ‒ Fabriques des niveaux archéologiques : méthode et premier bilan des apports à l’étude taphonomique des sites paléolithiques, PALEO.
+Revue d’archéologie préhistorique, , 14, p. 13‑28.
+
+BERTRAN P., TEXIER J.-P.
+(1995) ‒ Fabric analysis: application to Paleolithic sites, Journal of Archaeological Science, 22, 4, p. 521‑535.
+
+BORDES J.-G.
+(2000) ‒ La séquence aurignacienne de Caminade revisitée: l’apport des raccords d’intérêt stratigraphique.
+The Aurignacian sequence at Caminade Est revisited: contribution of the refittings to stratigraphie study, Paléo, Revue d’Archéologie Préhistorique, 12, 1, p. 387‑407.
+
+CURRAY J.R.
+(1956) ‒ The Analysis of Two-Dimensional Orientation Data, The Journal of Geology, 64, 2, p. 117‑131.
+
+ESTER M., KRIEGEL H.-P., SANDER J., XU X., OTHERS (1996) ‒ A density-based algorithm for discovering clusters in large spatial databases with noise, in kdd, p.226‑231.
+
+LENOBLE A.
+(2005) ‒Ruissellement et formation des sites préhistoriques: référentiel actualiste et exemples d’application au fossile., British Archaeological Report
+
+MCPHERRON S.P.
+(2018) ‒ Additional statistical and graphical methods for analyzing site formation processes using artifact orientations, PLOS ONE, 13, 1, p. e0190195.
+
+RIPLEY B.D.
+(1976) ‒ The second-order analysis of stationary point processes, Journal of applied probability, 13, 2, p. 255‑266.
+
+TIXIER J., INIZAN M.-L., ROCHE H., DAUVOIS M.
+(1980) ‒Préhistoire de la pierre taillée, Antibes Valbonne, CREP diffusion Association pour la promotion et la diffusion des connaissances archéologiques.
+
+TODISCO D., MALLOL C., LAHAYE C., GUÉRIN G., BACHELLERIE F., MORIN E., GRAVINA B., CHALLIER A., BEAUVAL C., BORDES J.-G., OTHERS (2023) ‒ A multiscalar and multiproxy geoarchaeological approach to site formation processes at the Middle and Upper Palaeolithic site of La Roche-à-Pierrot, Saint-Césaire, France, Quaternary Science Reviews, 315, p. 108218.
