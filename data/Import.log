@@ -1,0 +1,15 @@
+﻿Horodatage	NomFichier	Erreur	Message
+2024-05-13 10:21:08.784 +0200	xyz_ul.fmp12	0	Opérations d'importation démarrées
+2024-05-13 10:21:08.795 +0200	xyz_ul.fmp12	0	Importation de tables depuis le fichier “ mst_zb.xlsx ” démarrée
+2024-05-13 10:21:08.800 +0200	mst_zb	0	rubriques importés : 25
+2024-05-13 10:21:08.818 +0200	xyz_ul.fmp12	0	tables importés : 1
+2024-05-13 10:21:08.823 +0200	xyz_ul.fmp12	0	Importation terminée
+2024-05-13 10:21:08.832 +0200	xyz_ul.fmp12	0	Opérations d'importation validées
+2024-05-13 10:21:08.838 +0200	xyz_ul.fmp12	0	==================================================================
+2024-05-13 10:22:07.056 +0200	xyz_ul.fmp12	0	Opérations d'importation démarrées
+2024-05-13 10:22:07.093 +0200	xyz_ul.fmp12	0	Importation de tables depuis le fichier “ MST_14a23.xlsx ” démarrée
+2024-05-13 10:22:07.113 +0200	MST_14a23	0	rubriques importés : 19
+2024-05-13 10:22:07.115 +0200	xyz_ul.fmp12	0	tables importés : 1
+2024-05-13 10:22:07.115 +0200	xyz_ul.fmp12	0	Importation terminée
+2024-05-13 10:22:07.132 +0200	xyz_ul.fmp12	0	Opérations d'importation validées
+2024-05-13 10:22:07.136 +0200	xyz_ul.fmp12	0	==================================================================

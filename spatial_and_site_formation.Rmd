@@ -415,11 +415,11 @@ Aggregation or attractive relations between points or types can also be due to i
 
 **Fabric analysis**
 
-The Fabryka application (available at https://marchaeologist.shinyapps.io/fabryka/) was used to perform the fabric analysis. The main methods used are summarised below, and further information concerning the methods used are available in the application. All figures and statistics can be reproduced using the fabric data file available in the SOM of this article directly in the application.
+The Fabryka application (available at <https://marchaeologist.shinyapps.io/fabryka/>) was used to perform the fabric analysis. The main methods used are summarised below, and further information concerning the methods used are available in the application. All figures and statistics can be reproduced using the fabric data file available in the SOM of this article directly in the application.
 
 During excavations, the fabric (*i.e.* bearing and plunge) was systematically measured for all artifact types longer than 4 cm and with an elongation ratio (L/w) greater than 2.
 The bearing of the lower point is measured in the interval between 0 and 360° and the plunge between 0 and 90°.
-The bearing can be converted into an orientation in the interval [0;180] by subtracting 180° from the measurements belonging to the interval [180;360].
+The bearing can be converted into an axial data in the interval [0;180] by subtracting 180° from the measurements belonging to the interval [180;360].
 Two main statistical methods are used to characterize the fabric of a given assemblage (Bertran and Lenoble, 2002).
 The first focuses on the direction of measurements only.
 The orientation rate “r” (formula (1), or “L” when expressed as a percentage; Curray, 1956) allows the hypothesis of a unimodal distribution of artifact orientations to be tested.
@@ -512,7 +512,7 @@ The visual inspection of artifact projections in plan and section are insufficie
 xy_proj <- ggplot(data_xyz,aes(x, y, color=as.factor(article_corpus))) + 
   geom_point() + 
   scale_color_manual(values = c('#868686FF', '#EFC000FF', '#0073C2FF', '#CD534CFF')) +
-  theme(legend.position = c(1,1),
+  theme(legend.position = "right",
         legend.justification = c("right", "top"),
         legend.box.just = "right",
         legend.margin = margin(6, 6, 6, 6)) +
@@ -547,7 +547,7 @@ all_identified_45 = data.frame(x = all_identified_45$x, y = all_identified_45$y,
 xy_proj <- ggplot(all_identified,aes(x, y, color=nature)) + 
   geom_point() + 
   scale_color_manual(values = c('#EFC000FF', '#CD534CFF','#0073C2FF' ,'#868686FF')) +
-  theme(legend.position = c(1,1),
+  theme(legend.position = "right",
         legend.justification = c("right", "top"),
         legend.box.just = "right",
         legend.margin = margin(6, 6, 6, 6)) +
@@ -581,7 +581,7 @@ fauna_45 <- dplyr::filter(fauna_45, species %in% c('BB', 'CAB', 'MTH', 'RANG', '
 xy_fauna <- ggplot(fauna,aes(x, y, color=as.factor(species))) + 
   geom_point() + 
   scale_color_manual(values = c('#868686FF', '#EFC000FF', '#0073C2FF', '#CD534CFF', '#7AA6DCFF')) +
-  theme(legend.position = c(0,1),
+  theme(legend.position = "right",
         legend.justification = c("right", "top"),
         legend.box.just = "right",
         legend.margin = margin(6, 6, 6, 6)) +
@@ -665,7 +665,7 @@ knitr::kable(res_fab, format="pandoc")
 ## Particle size distribution of the lithic remains
 
 Analysis of the particle size distribution by spit (2 cm thick), sub-square and stratigraphic unit shows a clear difference between units 18/19, 19 and unit 18.
-The SU 18 spits in the upslope (K4 III-IV, J4 III-IV) and downslope areas (K5 IV, K5 III-IV) tend to cluster in or near the zone of experimental reduction sequences in all the sub-squares (fig. S7-\ref{fig:granulo}).
+The SU 18 spits in the upslope (K4 III-IV, J4 III-IV) and downslope areas (K5 IV, K5 III-IV) tend to cluster in or near the zone of experimental reduction sequences in all the sub-squares (fig. S7-\ref{fig:granulo} ; Supplementary Table S2).
 On the other hand, none of the SU 18 spits in the central band (K5 II-I, J5 I-II) fall within the zone of experimental reduction sequences due to the lack of pieces larger than 10 mm.
 
 The spits from SU 18/19 and 19 show a clear particle size sorting in favor of the smallest particles.
@@ -1225,7 +1225,7 @@ data_xyz_45_ls <- data_xyz_45 %>%
 xy_proj <- ggplot(data_xyz_ls,aes(x, y, color=as.factor(surface_state_class))) + 
   geom_point() + 
   scale_color_manual(values = c('grey90', 'lightgrey','darkgrey', 'grey28', 'black')) +
-  theme(legend.position = c(1,1),
+  theme(legend.position = "right",
         legend.justification = c("right", "top"),
         legend.box.just = "right",
         legend.margin = margin(6, 6, 6, 6)) +
