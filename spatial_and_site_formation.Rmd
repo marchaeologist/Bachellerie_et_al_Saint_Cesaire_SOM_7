@@ -4,7 +4,8 @@ header-includes:
 - \usepackage{pdflscape}
 - \newcommand{\blandscape}{\begin{landscape}}
 - \newcommand{\elandscape}{\end{landscape}}
-- \setcounter{page}{70}
+- \setcounter{page}{72}
+- \setcounter{section}{7}
 output:
   pdf_document: default
 editor_options:
@@ -12,8 +13,7 @@ editor_options:
     wrap: sentence
 ---
 
-Marc Thomas, Brad Gravina, Francçois Bachellerie, Solange Rigaud, Laure Dayet, Eugène Morin, Dominique Todisco, Carolina Mallol, Isabelle Crevecoeur\bigskip
-\bigbreak
+Marc Thomas, Brad Gravina, Francçois Bachellerie, Solange Rigaud, Laure Dayet, Eugène Morin, Dominique Todisco, Carolina Mallol, Isabelle Crevecoeur\bigskip \bigbreak
 
 ```{r working_directory_data, echo = FALSE, message = FALSE, include=FALSE}
 
@@ -361,16 +361,19 @@ draw_circle_diagram <- function(bg = "white", cex = 1, main = "", ...) {
 
 ```
 
-Here we present analyses designed to test the spatial relationship between the Châtelperronian and Mousterian lithics and the shell beads, coloring materials, and four major prey species in the SU 18-19 faunal assemblage. In addition, we discuss any potential relationships within the framework of a site formation model built from multiple geoarchaeological analyses, namely fabrics and artifact size distributions, as well as a consideration of lithic surface alterations and the systematic conjoining of flake and blade fragments. In the end, the analytical results and their consistency make it possible to propose a solid scenario for the formation of this mixed assemblage.
+Here we present analyses designed to test the spatial relationship between the Châtelperronian and Mousterian lithics and the shell beads, coloring materials, and four major prey species in the SU 18-19 faunal assemblage.
+In addition, we discuss any potential relationships within the framework of a site formation model built from multiple geoarchaeological analyses, namely fabrics and artifact size distributions, as well as a consideration of lithic surface alterations and the systematic conjoining of flake and blade fragments.
+In the end, the analytical results and their consistency make it possible to propose a solid scenario for the formation of this mixed assemblage.
 
-For the sake of tansparency, the parameter adopted in this study are justified in the text below. The R script is also provided (accessible at this adress <https://github.com/marchaeologist>) to enable the reader to reproduce the statistical tests, plots, and projections using the same criteria.
+For the sake of tansparency, the parameter adopted in this study are justified in the text below.
+The R script is also provided (accessible at this adress <https://github.com/marchaeologist>) to enable the reader to reproduce the statistical tests, plots, and projections using the same criteria.
 The code chunks can be run individually or with the “include” argument changed from ‘FALSE’ to ‘TRUE’ in the code chunks headers of the R markdown document or knit the document to the desired format (pdf, html or word).
 This is an essential prerequisite, since some of the tools used are totally objective or discriminating.\bigbreak
 
 # Methods
 
 We combined traditional spatial projections in plan view and sagittal transects with Kernel density analyses and spatial statistics to test for any structure and spatial relationships (Ripley’s K functions ; Baddeley 2008).
-The results of the spatial analysis were combined with consideration of artifact orientations and plunge (*i.e.* fabrics) and the horizontal and vertical size distribution of the lithic remains.\bigbreak
+The results of the spatial analysis were combined with consideration of artifact orientations and plunge (i.e., fabrics) and the horizontal and vertical size distribution of the lithic remains.\bigbreak
 
 **Piece plotted spatial projections**
 
@@ -381,13 +384,13 @@ To avoid squeezing a complex geometric reality (cone) into a single plane, the s
 
 **Kernel density and Ripley functions**
 
-Point patterns have two main properties: its intensity (*i.e.* "spatial preference", first-order property) and the neighbourhood relationship between points (second-order property).
+Point patterns have two main properties: its intensity (i.e., "spatial preference", first-order property) and the neighbourhood relationship between points (second-order property).
 A point pattern is homogeneous when its intensity does not vary within the observation window.
 A Kernel density analysis is used to describe this first property.
 Ripley's K-functions are used to analyse the second-order property (Ripley 1976, Baddeley *et al* 2015).
 Theses analyses applied to the horizontal (XY axis) projection of all piece-plotted material were carried out uniquely for SU 18 using the *spastats* package in R (Baddley *et al* 2015).
 
-The Ripley's "K" function (*i.e.* *spatstat*::Kest()) describe the structure of a 2D point pattern by comparing it at a complete random distribution (Poisson process) in a window of observation (Ripley 1976).
+The Ripley's "K" function (i.e., *spatstat*::Kest()) describe the structure of a 2D point pattern by comparing it at a complete random distribution (Poisson process) in a window of observation (Ripley 1976).
 The point pattern structure is :
 
 -   random when K *obs.* (r) = K *poisson* ;
@@ -396,28 +399,34 @@ The point pattern structure is :
 
 -   regular when K *obs.* (r) \< K *poisson*.
 
-The Ripley's K intertype function (*i.e.* *spatstat*::Kcross()) tests for spatial dependency between types of points.
+The Ripley's K intertype function (i.e., *spatstat*::Kcross()) tests for spatial dependency between types of points.
 The nature of the spatial link between the two types observed is considered :
 
--   attractive when K *obs*.
-    (r) \> K *poisson* ;
+-   attractive when K *obs.* (r) \> K *poisson* ;
 
 -   repulsive when K *obs.* (r) \< K *poisson* ;
 
--   reflecting no patterning (*i.e.* random) when K *obs.* (r) = K *poisson* (CSR, Complete Spatial Randomness).
+-   reflecting no patterning (i.e., random) when K *obs.* (r) = K *poisson* (CSR, Complete Spatial Randomness).
 
 To test the significance of the results, a Poisson process (CSR) is simulated 99 times using the Monte Carlo method.
-The critical values of the simulated Poisson processes (*i.e.* the upper and lower limits) fix the limits of the grey reference envelope.
+The critical values of the simulated Poisson processes (i.e., the upper and lower limits) fix the limits of the grey reference envelope.
 
-Aggregation or attractive relations between points or types can also be due to inhomogeneity in the point pattern (a “spatial preference”). There are two ways around this difficulty: using functions appropriate to heterogeneous point patterns (*spatstat*::Kinhom() and *spatstat*::Kcross.inhom()) and sampling a smaller window of observation where the point pattern is more homogeneous. The window selected for the K Ripley’s tests corresponds to a square containing all the remains of a type. For the K intertype tests, the selected window is a square that contains all the incidences of the type with the smallest spatial extent. For the Châtelperronian lithics, shell beads and pigments, this corresponds to a 1.5 square metre window. Correction of edge effects was done using the “isotropic” method.
+Aggregation or attractive relations between points or types can also be due to inhomogeneity in the point pattern (a “spatial preference”).
+There are two ways around this difficulty: using functions appropriate to heterogeneous point patterns (*spatstat*::Kinhom() and *spatstat*::Kcross.inhom()) and sampling a smaller window of observation where the point pattern is more homogeneous.
+The window selected for the K Ripley’s tests corresponds to a square containing all the remains of a type.
+For the K intertype tests, the selected window is a square that contains all the incidences of the type with the smallest spatial extent.
+For the Châtelperronian lithics, shell beads and pigments, this corresponds to a 1.5 square metre window.
+Correction of edge effects was done using the “isotropic” method.
 
 \bigbreak
 
 **Fabric analysis**
 
-The Fabryka application (available at <https://marchaeologist.shinyapps.io/fabryka/>) was used to perform the fabric analysis. The main methods used are summarised below, and further information concerning the methods used are available in the application. All figures and statistics can be reproduced using the fabric data file available in the SOM of this article directly in the application.
+The Fabryka application (available at <https://marchaeologist.shinyapps.io/fabryka/>) was used to perform the fabric analysis.
+The main methods used are summarised below, and further information concerning the methods used are available in the application.
+All figures and statistics can be reproduced using the fabric data file available in the SOM of this article directly in the application.
 
-During excavations, the fabric (*i.e.* bearing and plunge) was systematically measured for all artifact types longer than 4 cm and with an elongation ratio (L/w) greater than 2.
+During excavations, the fabric (i.e., bearing and plunge) was systematically measured for all artifact types longer than 4 cm and with an elongation ratio (L/w) greater than 2.
 The bearing of the lower point is measured in the interval between 0 and 360° and the plunge between 0 and 90°.
 The bearing can be converted into an axial data in the interval [0;180] by subtracting 180° from the measurements belonging to the interval [180;360].
 Two main statistical methods are used to characterize the fabric of a given assemblage (Bertran and Lenoble, 2002).
@@ -443,7 +452,7 @@ According to geomorphological observations in natural settings (Bertran and Texi
 In order to distinguish different statistical populations, we used the spatial exploration method proposed by McPherron (2018).
 This method makes it possible to calculate Benn indices and to test the orientation rate L (formula (3) modified R after McPherron’s 2018 script) for each artifact, taking into account its n nearest neighbors in three dimensions (R McPherron 2018 script, modified formula (4)).
 The fabric analysis proposed by McPherron (2018) has the advantage of spatializing the measurements and thus avoiding the arbitrary sampling traditionally carried out by square or spit.
-The statistical signal of a population can be explored more locally  by varying the number of measurements sampled when calculating Benn indices.
+The statistical signal of a population can be explored more locally by varying the number of measurements sampled when calculating Benn indices.
 The choice of 50 measurements (each artifact and its 50 closest neighbors) to calculate the Benn indices allows local particularities to be observed, and above all, it allows the Rayleigh test to be carried out in its field of application (stability of the test between 40 and 50 measurements).
 Mean values of Benn indices and Rayleigh tests (mean values of each series) are provided for each sample.
 The data is represented in several different ways.
@@ -471,11 +480,11 @@ All figures and statistics can be reproduced using the particle size data file a
 The application uses the method proposed by Lenoble (2005) and Bertran *et al.* (2006b).
 The archaeological samples are compared to an experimental knapping particle size model in a ternary diagram.
 We have adapted the particle size distribution model to the technological content of SU 18-19 by combining data from the experimental Levallois, discoidal and blade reduction sequences available in Bertran *et al.* (2006a).
-The model (blue area) is constructed using the Mahalanobis  method (detection of the outliers in the dataset) and takes into account the counts of lithic artifacts between 2 and 4 mm, 4 and 10 mm, and greater than 10 mm.\bigbreak
+The model (blue area) is constructed using the Mahalanobis method (detection of the outliers in the dataset) and takes into account the counts of lithic artifacts between 2 and 4 mm, 4 and 10 mm, and greater than 10 mm.\bigbreak
 
 **Systematic conjoining of lithic fragments from SU 18 and SU 18-19**
 
-The systematic testing of conjoinable lithic fragments can provide important information concerning the transport of material both during occupations (*i.e.* anthropogenic action) and the site formation processes (*i.e.* natural).
+The systematic testing of conjoinable lithic fragments can provide important information concerning the transport of material both during occupations (i.e., anthropogenic action) and the site formation processes (i.e., natural).
 This method involves a systematic search for "fracture connections" (Tixier 1980) on blade and flake fragments, whether retouched or not (Bordes 2000).
 A systematic conjoining program offers two advantages compared to the traditional refitting.
 Firstly, in the vast majority of cases, the two surfaces of a break are complementary over their entire surface, making it easier to identify connections compared to refitting dorsal and ventral surfaces.
@@ -502,12 +511,10 @@ The conjoin success rate (P) was then calculated as: (4) $$P = number~of~connect
 
 Projections of the assemblage by stratigraphic field units (SU) depict a single layer of archaeological material whose rocky base appears less dense in archaeological material (fig. S7-\ref{field_us_projection}).
 No immediately perceptible organization is evident when the Châtelperronian and Mousterian lithics, shell beads and pigments are projected in sagittal view (fig. S7-\ref{projection_types}B).
-However, in plan view (fig. S7-\ref{projection_types}A), the Châtelperronian lithics appear to cluster in the square K5 (-12,0 < x < - 11,0 and 5,0 < y < 6,0).
-The projections in plan and section of the five main species comprising the SU 18-19 faunal assemblage reveal no clearly identifiable patterning (fig. S7- \ref{species_projection}.
-The visual inspection of artifact projections in plan and section are insufficient to reliably associate the shell beads, pigments or specific species with either the Mousterian or Châtelperronian component of SU 18-19.
-\bigbreak
+However, in plan view (fig. S7-\ref{projection_types}A), the Châtelperronian lithics appear to cluster in the square K5 (-12,0 \< x \< - 11,0 and 5,0 \< y \< 6,0).
+The projections in plan and section of the five main species comprising the SU 18-19 faunal assemblage reveal no clearly identifiable patterning (fig. S7- \ref{species_projection}. The visual inspection of artifact projections in plan and section are insufficient to reliably associate the shell beads, pigments or specific species with either the Mousterian or Châtelperronian component of SU 18-19. \bigbreak
 
-```{r field_us_projection, cache = TRUE, fig.cap="Plan view (A) and one-meter thick transect (B; Y-Z with 45° rotation of XY axis) of all piece-plotted material from SU 18, 18/19 and 19 \\label{field_us_projection}", echo = FALSE, message = FALSE, fig.height = 8}
+```{r field_us_projection, cache = TRUE, fig.cap="Plan view (A) and one-meter thick transect (B; Y-Z with 45° rotation of XY axis) of all piece-plotted material from SU 18, 18/19 and 19. \\label{field_us_projection}", echo = FALSE, message = FALSE, fig.height = 8}
 
 xy_proj <- ggplot(data_xyz,aes(x, y, color=as.factor(article_corpus))) + 
   geom_point() + 
@@ -534,7 +541,7 @@ ggdraw() +
 
 ```
 
-```{r projection_types, cache = TRUE, echo = FALSE, message = FALSE, fig.height = 8, fig.cap="Plan view (A) and transect (B; Y-Z with 45° rotation of XY axis) of piece-plotted Mousterian and Châtelperronian lithics, shell beads and pigments from SU 18, 18/19 and 19. Bead = Shell bead; col_mat = Pigment; CP = Châtelperronian; MST = Mousterian \\label{projection_types}"}
+```{r projection_types, cache = TRUE, echo = FALSE, message = FALSE, fig.height = 8, fig.cap="Plan view (A) and transect (B; Y-Z with 45° rotation of XY axis) of piece-plotted Mousterian and Châtelperronian lithics, shell beads and pigments from SU 18, 18/19 and 19. Bead = Shell bead; col_mat = Pigment; CP = Châtelperronian; MST = Mousterian. \\label{projection_types}"}
 
 all_identified <- dplyr::select(data_xyz, x,y,z, nature)
 all_identified <- dplyr::filter(all_identified, nature != 'NA')
@@ -569,7 +576,7 @@ ggdraw() +
 
 ```
 
-```{r species_projection, cache = TRUE, echo=FALSE, message = FALSE, include = TRUE, fig.height = 7, fig.cap="Plan view (A) and transect (B; Y-Z with 45° rotation of XY axis) of piece-plotted elements of the five main species in the SU 18-19 faunal assemblage. BB = Bison; CAB = Horse; MTH = Mammoth; RANG = Reindeer; RHINO = Rhinoceros \\label{species_projection}"}
+```{r species_projection, cache = TRUE, echo=FALSE, message = FALSE, include = TRUE, fig.height = 7, fig.cap="Plan view (A) and transect (B; Y-Z with 45° rotation of XY axis) of piece-plotted elements of the five main species in the SU 18-19 faunal assemblage. BB = Bison; CAB = Horse; MTH = Mammoth; RANG = Reindeer; RHINO = Rhinoceros. \\label{species_projection}"}
 
 # identified faunal remains for projections
 fauna <- dplyr::select(data_xyz, x, y, z, species)
@@ -617,7 +624,7 @@ This pattern could fit with objects deposited in a context of rock fall and/or b
 \bigbreak
 
 Table 1.
-Summary results of the fabric analysis
+Summary results of the fabric analysis.
 
 ```{r fab_stats, echo=FALSE, message = FALSE, include = FALSE}
 
@@ -658,7 +665,7 @@ res_fab <- cbind(group = c("1", "2", "3"), round(rbind(group_1, group_2, group_3
 
 ```
 
-```{r stats_fab_res, echo = FALSE, message = FALSE, warning =FALSE, caption="Summary statistics of the fabric analysis"}
+```{r stats_fab_res, echo = FALSE, message = FALSE, warning =FALSE, caption="Summary statistics of the fabric analysis."}
 knitr::kable(res_fab, format="pandoc")
 ```
 
@@ -676,14 +683,13 @@ For these reasons, the following spatial exploration only considers the remains 
 
 \blandscape
 
-```{r fabric_analysis, out.extra='angle=0', echo = FALSE, message=FALSE, fig.align='center', fig.cap='SU 18-19 fabrics: (A) Benn diagram of all measurements (combined SU); (B) Plan view with the three identified fabric groups; (C) Benn diagrams, (D) Schmidt diagrams, (E) Orientation rose diagrams, and (F) Plunge rose diagrams for each of the three groups', out.width='0.95\\linewidth'}
+```{r fabric_analysis, out.extra='angle=0', echo = FALSE, message=FALSE, fig.align='center', fig.cap='SU 18-19 fabrics: (A) Benn diagram of all measurements (combined SU); (B) Plan view with the three identified fabric groups; (C) Benn diagrams, (D) Schmidt diagrams, (E) Orientation rose diagrams, and (F) Plunge rose diagrams for each of the three groups.', out.width='0.95\\linewidth'}
 knitr::include_graphics("./fig_def/fabric_analysis.pdf")
 ```
 
 \elandscape
 
-
-```{r granulo, echo = FALSE, message=FALSE, fig.align='center', fig.cap='SU 18, 18/19, 19 artifact size distribution', out.width='0.9\\linewidth'}
+```{r granulo, echo = FALSE, message=FALSE, fig.align='center', fig.cap='SU 18, 18/19, 19 artifact size distribution.', out.width='0.9\\linewidth'}
 knitr::include_graphics("./fig_def/granulo_som.pdf")
 ```
 
@@ -883,7 +889,7 @@ d_mth_ppp = ppp(mth$x, mth$y, w_big)
 
 ```
 
-```{r kernel, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE, fig.height = 8.5, fig.cap="Kernel density by artifact type and the five main species of the SU 18 faunal assemblage \\label{kernel}"}
+```{r kernel, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE, fig.height = 8.5, fig.cap="Kernel density by artifact type and the five main species of the SU 18 faunal assemblage. \\label{kernel}"}
 
 par(mfrow = c(3,3))
 
@@ -955,10 +961,10 @@ points(d_mth_ppp$x, d_mth_ppp$y, pch=20, cex = 0.2)
 ## Spatial dependency of plotted remains within types (Ripley's K, homogeneous and inhomogeneous functions)
 
 Ripley's homogeneous K function shows aggregated structures for each type (fig. S7-\ref{kest}).
-However, the inhomogeneous functions show structures compatible with Poisson processes except for the Moustrian lithic remains and bison bones, which show attractive links below a radius of 0.3 to 0.4 metres (fig. S7-\ref{kinhom}).
+However, the inhomogeneous functions show structures compatible with Poisson processes except for the Mousterian lithic remains and bison bones, which show attractive links below a radius of 0.3 to 0.4 metres (fig. S7-\ref{kinhom}).
 The results return by the inhomogeneous function for the other types are compatible with a CSR pattern and could be due to smaller sample sizes.
 
-```{r kest, echo = FALSE, cache = TRUE, warning = FALSE, results = FALSE, message = FALSE, include  = TRUE, fig.height = 8.5, fig.cap="Result of the Ripley's K 'homogeneous' function by artifact type \\label{kest}"}
+```{r kest, echo = FALSE, cache = TRUE, warning = FALSE, results = FALSE, message = FALSE, include  = TRUE, fig.height = 8.5, fig.cap="Result of the Ripley's K 'homogeneous' function by artifact type. \\label{kest}"}
 
 # moust_hom <- homtest(d_moust_ppp)$p.value
 # chatel_hom <- homtest(d_chatel_ppp)$p.value
@@ -980,7 +986,7 @@ plot(spatstat.explore::envelope(d_cab_ppp, Kest, correction = "isotropic"), main
 
 ```
 
-```{r kinhom, echo = FALSE, cache = TRUE, warning = FALSE, results = FALSE, message = FALSE, include  = TRUE, fig.height = 8.5, fig.cap="Result of the Ripley's K 'inhomogeneous' function by artifact type \\label{kinhom}"}
+```{r kinhom, echo = FALSE, cache = TRUE, warning = FALSE, results = FALSE, message = FALSE, include  = TRUE, fig.height = 8.5, fig.cap="Result of the Ripley's K 'inhomogeneous' function by artifact type. \\label{kinhom}"}
 
 # moust_hom <- homtest(d_moust_ppp)$p.value
 # chatel_hom <- homtest(d_chatel_ppp)$p.value
@@ -1006,11 +1012,11 @@ plot(spatstat.explore::envelope(d_cab_ppp, Kinhom, correction = "isotropic"), ma
 
 When the spatial dependency between remains types are tested (fig. S7-\ref{kcross}), it appears that :
 
--   chatelperronian lithics versus shell beads, chatelperronian lithics versus pigments and shell beads versus pigments are all spatially associated two by two.
+-   Chatelperronian lithics versus shell beads, Chatelperronian lithics versus pigments and shell beads versus pigments are all spatially associated two by two.
 
--   mousterian lithics versus beads, mousterian lithics versus pigments and mousterian lithics versus chatelperronian lithics show no spatial dependency.
+-   Mousterian lithics versus beads, Mousterian lithics versus pigments and Mousterian lithics versus Chatelperronian lithics show no spatial dependency.
 
-```{r kcross, echo = FALSE, cache = TRUE, warning = FALSE, results = FALSE, message = FALSE, fig.height = 8.5, fig.cap="Results of the Ripley intertype tests by artifact type (homogeneous function) \\label{kcross}"}
+```{r kcross, echo = FALSE, cache = TRUE, warning = FALSE, results = FALSE, message = FALSE, fig.height = 8.5, fig.cap="Results of the Ripley intertype tests by artifact type (homogeneous function). \\label{kcross}"}
 
 # data preparation
 chatel_n_bead = rbind(bead, chatel)
@@ -1102,13 +1108,13 @@ bead_n_col_mat_ppp = ppp(bead_n_col_mat$x, bead_n_col_mat$y, w_big, marks = as.f
 
 ## Spatial dependency between plotted remains according to type (Ripley's K intertype, inhomogeneous function)
 
-When applied to the same pairs of remains, the inhomogeneous Ripley's K intertype function show no particular pattern (fig. S7-\ref{kcross_inhom} ; this test appears unsatisfactory and return unreadable graphs).
+When applied to the same pairs of remains, the inhomogeneous Ripley's K intertype function shows no particular pattern (fig. S7-\ref{kcross_inhom} ; this test appears unsatisfactory and returns unreadable graphs).
 The spatial dependence (homogeneous intertype K function) between Châtelperronian lithic remains, shell beads and pigments could be caused by both first-order property and the second-order property.
 An interesting result is the lack of spatial dependence for the same test for pairs of Mousterian lithic remains, shell beads and pigments for this smaller observation window.
 However, due to the heterogeneity of the point pattern, a larger window would give all associated types two by two.
-The approximately 1.50 square metre window used for the Chatelperronian lithics, shell beads and pigments pair test could reflect the size of an area of technical activity.
+The approximately 1.50 square window used for the Chatelperronian lithics, shell beads and pigments pair test could reflect the size of an area of technical activity.
 
-```{r kcross_inhom, echo=FALSE, cache = TRUE, message = FALSE, warning = TRUE, results = FALSE, include = TRUE, fig.height = 8.5, fig.cap="Results of the Ripley intertype tests by artifact type (inhomogeneous function) \\label{kcross_inhom}"}
+```{r kcross_inhom, echo=FALSE, cache = TRUE, message = FALSE, warning = TRUE, results = FALSE, include = TRUE, fig.height = 8.5, fig.cap="Results of the Ripley intertype tests by artifact type (inhomogeneous function). \\label{kcross_inhom}"}
 
 # unsatisfactory test. Unreadable graphs.
 # conversion to ppp objects
@@ -1138,7 +1144,7 @@ The Ripley’s K intertype test for spatial associations between the two SU 18 c
 
 -   Châtelperronian lithics not to be associated with any particular species.
 
-```{r kcross_CP_species, cache = TRUE, echo=FALSE, message = FALSE, warning = FALSE, results = FALSE, include = TRUE, fig.height = 8.5, fig.cap="Results of the Ripley intertype (homogeneous) tests between Châtelperronian lithics and five major faunal species \\label{kcross_CP_species}"}
+```{r kcross_CP_species, cache = TRUE, echo=FALSE, message = FALSE, warning = FALSE, results = FALSE, include = TRUE, fig.height = 8.5, fig.cap="Results of the Ripley intertype (homogeneous) tests between Châtelperronian lithics and five major faunal species. \\label{kcross_CP_species}"}
 
 # data preparation
 chatel_n_bb = rbind(chatel, bb)
@@ -1186,7 +1192,7 @@ plot(spatstat.explore::envelope(chatel_n_rhino_ppp, Kcross, correction = "isotro
 
 ```
 
-```{r kcross_moust_species, cache = TRUE, echo=FALSE, message = FALSE, warning = FALSE, results = FALSE, include = TRUE, fig.height = 8.5, fig.cap="Results of the Ripley intertype (homogeneous) tests between Mousterian lithics and five major animal species  \\label{kcross_moust_species}"}
+```{r kcross_moust_species, cache = TRUE, echo=FALSE, message = FALSE, warning = FALSE, results = FALSE, include = TRUE, fig.height = 8.5, fig.cap="Results of the Ripley intertype (homogeneous) tests between Mousterian lithics and five major animal species.  \\label{kcross_moust_species}"}
 
 # redo the Kcross intertype tests between mousterian lithics ans species
 par(mfrow = c(2,3))
@@ -1213,7 +1219,7 @@ Finally, the cluster 2 Mousterian material is substantially less well preserved,
 Concentrating upslope, at the base of the limestone cliff and towards the summit of SU 18, the composition of this cluster likely reflects the combined action of rock fall connected to the retreat of the cliff and collapse of the overhang, longer artifact transport distances, and the introduction of material from above the cliff.
 The latter would be consistent with the high number of iron-stained geofacts originating from flint-bearing alterites above the site.
 
-```{r lithic_surf_state_projection, cache = TRUE, fig.cap="Plan view (A) and transect following the primary slope of the deposits (B; Y-Z with 45° rotation of XY axis) of the lithic surface alterations \\label{lithic_surf_state_projection}", echo = FALSE, message = FALSE, fig.height = 6}
+```{r lithic_surf_state_projection, cache = TRUE, fig.cap="Plan view (A) and transect following the primary slope of the deposits (B; Y-Z with 45° rotation of XY axis) of the lithic surface alterations. \\label{lithic_surf_state_projection}", echo = FALSE, message = FALSE, fig.height = 6}
 
 data_xyz_ls <- data_xyz %>%
   filter(surface_state_class != 'NA')
@@ -1247,7 +1253,7 @@ ggdraw() +
 
 ```
 
-```{r moust_sep_clusters, echo = FALSE, warning = FALSE, results = FALSE, message = FALSE, fig.height = 4, fig.cap="Separation of the two clusters of Mousterian lithic remains using the ‘dbscan’ algorithm \\label{moust_sep_clusters}", fig.height  = 3}
+```{r moust_sep_clusters, echo = FALSE, warning = FALSE, results = FALSE, message = FALSE, fig.height = 4, fig.cap="Separation of the two clusters of Mousterian lithic remains using the ‘dbscan’ algorithm. \\label{moust_sep_clusters}", fig.height  = 3}
 
 #les 2 clusters de moust font une soixantaine de cm  de diamètre et regroupent une 30aine de points
 #on demande à l'algo dbscan de chercher 2 clusters dans cet ordre d'idée
@@ -1267,7 +1273,7 @@ fviz_cluster(res_moust, db_mouste, stand = FALSE, ellipse.type = "t", geom = "po
 
 ```
 
-```{r barplots_lithic_states, echo = FALSE, warning = FALSE, results = FALSE, message = FALSE, fig.cap="Surface alterations of the lithic remains by techno-complex (MST = Mousterian; CP = Châtelperronian). Type 0 = fresh, unlustred surfaces, intact edges and ridges; Type 1 = slightly lustred surfaces, relatively well-preserved ridges, intact edges; Type 3 = lustred surfaces, relatively well-preserved ridges, at least one edge bearing mechanical, often alternate edge damage; Type 4 =  heavily lustred surfaces with multiple edges bearing highly abrupt, often alternate mechanical damage, sometimes associated with macroscopic crushing \\label{barplots_lithic_states}", fig.height = 3}
+```{r barplots_lithic_states, echo = FALSE, warning = FALSE, results = FALSE, message = FALSE, fig.cap="Surface alterations of the lithic remains by techno-complex (MST = Mousterian; CP = Châtelperronian). Type 0 = fresh, unlustred surfaces, intact edges and ridges; Type 1 = slightly lustred surfaces, relatively well-preserved ridges, intact edges; Type 3 = lustred surfaces, relatively well-preserved ridges, at least one edge bearing mechanical, often alternate edge damage; Type 4 =  heavily lustred surfaces with multiple edges bearing highly abrupt, often alternate mechanical damage, sometimes associated with macroscopic crushing. \\label{barplots_lithic_states}", fig.height = 3}
 
 res_clust_moust <- data.frame(x = db_moust$x, y = db_moust$y, z = db_moust$z, acc = db_moust$nature, alt_lithiq = db_moust$surface_state_class, cluster = res_moust$cluster)
 
@@ -1316,7 +1322,7 @@ ggdraw() +
 
 For the SU 18-19 lithic assemblage, 363 fragments out of a total of 865 were selected according to the criteria described above (breakage greater than 15 mm long and thickness greater than 5 mm): 149 proximal fragments, 95 mesial fragments, and 119 distal fragments.
 In terms of chrono-cultural attribution, the sample comprises primarily indeterminate fragments (80.7 %, n = 193), followed by those attributable to the Mousterian (15.9 %, n = 58) and Châtelperronian fragments (3.3 %, n = 12).
-In the end, the conjoining program produced seven connections out of a possible 52,121, giving a P value of 1.92 %, equivalent to that obtained for Lévêque’s EJOP sup / EJOP (Gravina *et al.* 2018).
+In the end, the conjoining program produced seven connections out of a possible 52,121, giving a p-value of 1.92 %, equivalent to that obtained for Lévêque’s EJOP sup / EJOP (Gravina *et al.* 2018).
 The connections concern six fragments attributed to the Mousterian, two to the Châtelperronian, and six indeterminate fragments.
 
 This extremely low success rate is highly unlikely to reflect techno-economic choices of the groups responsible for the SU 18-19 assemblage.
@@ -1328,7 +1334,7 @@ The fact that several of the conjoined pieces exhibit lustred surfaces combined 
 The different lines of evidence outlined above, combined with geoarchaeological information (Todisco, Mallol *et al.* 2023), allow a hypothetical formation history for SU 18 and 19 to be proposed (Fig. 4 in main text) :
 
 -   *Phase 1* : Initial Mousterian occupation of the collapsed rock-shelter and overlying plateau.
-An initial Mousterian (Discoid and/or Levallois) occupation took place at the base of the limesone cliff on the collapsed rock-shelter and overlying slopes (*cf.* SOM 3) with an emphasis on the processing of bison carcasses.
+    An initial Mousterian (Discoid and/or Levallois) occupation took place at the base of the limesone cliff on the collapsed rock-shelter and overlying slopes (*cf.* SOM 3) with an emphasis on the processing of bison carcasses.
     These occupations were contemporaneous with the activity of the stone-banked solifluction lobe whose front developed in square J5 (Todisco, Maillol *et al.* 2023; fabric analysis, group 1).
     Larger objects were moved upwards to the surface due to the action of ice heave (cryoexpulsion) and remobilized with other similarly sized pieces downslope, forming the semi-circular stony front of the lobe.
     These processes ultimately resulted in a higher density of material in the distal excavated area.
@@ -1336,11 +1342,16 @@ An initial Mousterian (Discoid and/or Levallois) occupation took place at the ba
     Despite this remobilization, the lithic material from phase 1 is relatively well preserved.
 
 -   *Phase 2* : A brief Châtelperronian stop-over on a reworked Mousterian substrate.
-Once the solifluction lobe was inactive a nd fossilized, Châtelperronian groups set up a very localized area of technical activity, primarily in square K5, which included the maintenance of stone tools (*cf.* SOM 3) and the manufacture of shell beads as well as ocher use. This likely short occupation, typical of this techno-complex (Bachellerie 2011), cannot be reliably associated with any particular faunal species, which, of course, does not rule out Châtelperronian groups carrying out subsistence activities on-site. During this phase, sedimentation is primarily dominated by shallow surface runoff (low energy flow) resulting in relatively good preservation of the lithic surfaces and relatively unaltered spatial associations between different artifact types. Limited transport of the highly mobile shell beads is, however, evidenced by their being wedged against the limestone blocks in SU 18.
+    Once the solifluction lobe was inactive (i.e., fossilized), Châtelperronian groups set up a very localized area of technical activity, primarily in square K5, which included the maintenance of stone tools (*cf.* SOM 3) and the manufacture of shell beads as well as ocher use.
+    This likely short occupation, typical of this techno-complex (Bachellerie 2011), cannot be reliably associated with any particular faunal species, which, of course, does not rule out Châtelperronian groups carrying out subsistence activities on-site.
+    During this phase, sedimentation is primarily dominated by shallow surface runoff (low energy flow) resulting in relatively good preservation of the lithic surfaces and relatively unaltered spatial associations between different artifact types.
+    Limited transport of the highly mobile shell beads is, however, evidenced by their being wedged against the limestone blocks in SU 18.
 
 -   *Phase 3* : Abandonment of the rock-shelter and introduction of exogenous artifacts.
-Mousterian lithics and faunal remains (primarily bison) abandoned on the portion above the site (top of the cliff) during the phase 1 occupation are introduced into the shelter via the expanding diaclase. These processes are reflected in the heavily altered surfaces of the lithic material clustered towards the base of the cliff and at the summit of SU 18, where they become mixed with material from phases 1 and 2. This exogenous input is further reinforced by the arrival of fine-grained sediments (such as clay, silt, sand) from the slopes above the cliff and the presence of numerous geofacts at the top of SU 18 (Todisco, Mallol *et al.* 2023).
-    
+    Mousterian lithics and faunal remains (primarily bison) abandoned on the portion above the site (top of the cliff) during the phase 1 occupation are introduced into the shelter via the expanding diaclase.
+    These processes are reflected in the heavily altered surfaces of the lithic material clustered towards the base of the cliff and at the summit of SU 18, where they become mixed with material from phases 1 and 2.
+    This exogenous input is further reinforced by the arrival of fine-grained sediments (such as clay, silt, sand) from the slopes above the cliff and the presence of numerous geofacts at the top of SU 18 (Todisco, Mallol *et al.* 2023).
+
 \pagebreak
 
 # Bibliography
@@ -1349,14 +1360,18 @@ BACHELLERIE F.
 (2011) ‒ Quelle unité pour le Châtelperronien?:
 apport de l’analyse taphonomique et techno-économique des industries lithiques de trois gisements aquitains de plein air: le Basté, Bidart (Pyrénées-Atlantiques) et Canaule II (Dordogne), PhD Thesis, Bordeaux 1
 
-BADDELEY A., RUBAK E., TURNER R. (2015) - Spatial Point Patterns: Methodology and Applications with R. Chapman and Hall/CRC Press, London. ISBN 9781482210200, https://www.routledge.com/Spatial-Point-Patterns-Methodology-and-Applications-with-R/Baddeley-Rubak-Turner/p/book/9781482210200/.
+BADDELEY A., RUBAK E., TURNER R.
+(2015) - Spatial Point Patterns: Methodology and Applications with R.
+Chapman and Hall/CRC Press, London.
+ISBN 9781482210200, <https://www.routledge.com/Spatial-Point-Patterns-Methodology-and-Applications-with-R/Baddeley-Rubak-Turner/p/book/9781482210200/>.
 
 BERTRAN P., CLAUD É., DETRAIN L., LENOBLE A., MASSON B., VALLIN L.
 (2006) ‒ Composition granulométrique des assemblages lithiques.
 Application à l’étude taphonomique des sites paléolithiques, PALEO.
 Revue d’archéologie préhistorique, , 18, p. 7‑36.
 
-BERTRAN P. dir. (2004) ‒ Dépôts de pente continentaux, dynamique et faciès, Quaternaire (Paris), 441p.
+BERTRAN P. dir.
+(2004) ‒ Dépôts de pente continentaux, dynamique et faciès, Quaternaire (Paris), 441p.
 
 BERTRAN P., LENOBLE A.
 (2002) ‒ Fabriques des niveaux archéologiques : méthode et premier bilan des apports à l’étude taphonomique des sites paléolithiques, PALEO.
