@@ -13,7 +13,7 @@ editor_options:
     wrap: sentence
 ---
 
-Marc Thomas, Brad Gravina, Francçois Bachellerie, Solange Rigaud, Laure Dayet, Eugène Morin, Dominique Todisco, Carolina Mallol, Isabelle Crevecoeur\bigskip \bigbreak
+Marc Thomas, Brad Gravina, François Bachellerie, Solange Rigaud, Laure Dayet, Eugène Morin, Dominique Todisco, Carolina Mallol, Isabelle Crevecoeur\bigskip \bigbreak
 
 ```{r working_directory_data, echo = FALSE, message = FALSE, include=FALSE}
 
@@ -370,7 +370,7 @@ The R script is also provided (accessible at this adress <https://github.com/mar
 The code chunks can be run individually or with the “include” argument changed from ‘FALSE’ to ‘TRUE’ in the code chunks headers of the R markdown document or knit the document to the desired format (pdf, html or word).
 This is an essential prerequisite, since some of the tools used are totally objective or discriminating.\bigbreak
 
-# Methods
+# 7.1. Methods
 
 We combined traditional spatial projections in plan view and sagittal transects with Kernel density analyses and spatial statistics to test for any structure and spatial relationships (Ripley’s K functions ; Baddeley 2008).
 The results of the spatial analysis were combined with consideration of artifact orientations and plunge (i.e., fabrics) and the horizontal and vertical size distribution of the lithic remains.\bigbreak
@@ -505,7 +505,7 @@ The systematic search for fracture connections amongst the SU 18-19 lithic assem
 
 The conjoin success rate (P) was then calculated as: (4) $$P = number~of~connections~found~/~total~number~of~fragments* 100$$
 
-# Results
+# 7.2. Results
 
 ## Spatial projections of plotted pieces per stratigraphic units and types
 
@@ -1329,7 +1329,7 @@ This extremely low success rate is highly unlikely to reflect techno-economic ch
 Instead, it is better interpreted as resulting from the incorporation of archaeological material unrelated to the occupation of the collapsed rockshelter into a partially soliflucted stratigraphic unit that equally underwent some degree of gravitational sorting (movement of pieces downslope and out of the excavation window) in the context of an open-air slope deposit reworked under periglacial conditions.
 The fact that several of the conjoined pieces exhibit lustred surfaces combined with breaks or steep mechanical edge damage with double patinas would be consistent with at least two phases of artifact transport.
 
-# A model for the formation of SU 18-19
+# 7.3. A model for the formation of SU 18-19
 
 The different lines of evidence outlined above, combined with geoarchaeological information (Todisco, Mallol *et al.* 2023), allow a hypothetical formation history for SU 18 and 19 to be proposed (Fig. 4 in main text) :
 
