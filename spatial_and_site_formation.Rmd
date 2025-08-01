@@ -2,18 +2,24 @@
 title: Supplementary Text S7. Site formation processes and spatial analysis of stratigraphic units 18 and 19 
 header-includes:
 - \usepackage{pdflscape}
+- \usepackage{chngcntr}
 - \newcommand{\blandscape}{\begin{landscape}}
 - \newcommand{\elandscape}{\end{landscape}}
 - \setcounter{page}{72}
-- \setcounter{section}{7}
+- \renewcommand{\figurename}{Figure S}
 output:
-  pdf_document: default
+  pdf_document:
+    fig_caption: yes
+    includes:
+        in_header: mystyle.sty
 editor_options:
   markdown:
     wrap: sentence
 ---
 
 Marc Thomas, Brad Gravina, François Bachellerie, Solange Rigaud, Laure Dayet, Eugène Morin, Dominique Todisco, Carolina Mallol, Isabelle Crevecoeur\bigskip \bigbreak
+
+\setcounter{figure}{36}
 
 ```{r working_directory_data, echo = FALSE, message = FALSE, include=FALSE}
 
@@ -361,7 +367,7 @@ draw_circle_diagram <- function(bg = "white", cex = 1, main = "", ...) {
 
 ```
 
-Here we present analyses designed to test the spatial relationship between the Châtelperronian and Mousterian lithics and the shell beads, coloring materials, and four major prey species in the SU 18-19 faunal assemblage.
+Here we present analyses designed to test the spatial relationship between the Châtelperronian and Mousterian lithics and the shell beads, coloring materials, and four major prey species in the SU 18, 19 and 18/19 faunal assemblage.
 In addition, we discuss any potential relationships within the framework of a site formation model built from multiple geoarchaeological analyses, namely fabrics and artifact size distributions, as well as a consideration of lithic surface alterations and the systematic conjoining of flake and blade fragments.
 In the end, the analytical results and their consistency make it possible to propose a solid scenario for the formation of this mixed assemblage.
 
@@ -377,7 +383,7 @@ The results of the spatial analysis were combined with consideration of artifact
 
 **Piece plotted spatial projections**
 
-We generated projections of piece-plotted artifacts both in plan view (XY axis) and following the general SE-NW slope of SU 18-19 (sagittal projections along the YZ axis).
+We generated projections of piece-plotted artifacts both in plan view (XY axis) and following the general SE-NW slope of SU 18, 19 and 18/19 (sagittal projections along the YZ axis).
 The field coordinates were rotated 45° uniquely for the sagittal projections.
 To avoid squeezing a complex geometric reality (cone) into a single plane, the sagittal projections represent a one-meter thick transect following the primary slope of the deposits (-11.5 \< x \< -10.5).
 \bigbreak
@@ -390,8 +396,8 @@ A Kernel density analysis is used to describe this first property.
 Ripley's K-functions are used to analyse the second-order property (Ripley 1976, Baddeley *et al* 2015).
 Theses analyses applied to the horizontal (XY axis) projection of all piece-plotted material were carried out uniquely for SU 18 using the *spastats* package in R (Baddley *et al* 2015).
 
-The Ripley's "K" function (i.e., *spatstat*::Kest()) describe the structure of a 2D point pattern by comparing it at a complete random distribution (Poisson process) in a window of observation (Ripley 1976).
-The point pattern structure is :
+The Ripley's "K" function (i.e., *spatstat*::Kest()) describes the structure of a 2D point pattern by comparing it at a complete random distribution (Poisson process) in a window of observation (Ripley 1976).
+The point pattern structure is:
 
 -   random when K *obs.* (r) = K *poisson* ;
 
@@ -400,7 +406,7 @@ The point pattern structure is :
 -   regular when K *obs.* (r) \< K *poisson*.
 
 The Ripley's K intertype function (i.e., *spatstat*::Kcross()) tests for spatial dependency between types of points.
-The nature of the spatial link between the two types observed is considered :
+The nature of the spatial link between the two types observed is considered:
 
 -   attractive when K *obs.* (r) \> K *poisson* ;
 
@@ -424,7 +430,7 @@ Correction of edge effects was done using the “isotropic” method.
 
 The Fabryka application (available at <https://marchaeologist.shinyapps.io/fabryka/>) was used to perform the fabric analysis.
 The main methods used are summarised below, and further information concerning the methods used are available in the application.
-All figures and statistics can be reproduced using the fabric data file available in the SOM of this article directly in the application.
+All figures and statistics can be reproduced using the fabric data file available in the Supplementary Dataset S1 of this article directly in the application.
 
 During excavations, the fabric (i.e., bearing and plunge) was systematically measured for all artifact types longer than 4 cm and with an elongation ratio (L/w) greater than 2.
 The bearing of the lower point is measured in the interval between 0 and 360° and the plunge between 0 and 90°.
@@ -432,7 +438,7 @@ The bearing can be converted into an axial data in the interval [0;180] by subtr
 Two main statistical methods are used to characterize the fabric of a given assemblage (Bertran and Lenoble, 2002).
 The first focuses on the direction of measurements only.
 The orientation rate “r” (formula (1), or “L” when expressed as a percentage; Curray, 1956) allows the hypothesis of a unimodal distribution of artifact orientations to be tested.
-If the “p” value returned by the Rayleigh test (2) is less than 0.05, the null hypothesis of a random orientation from a uniform distribution can be rejected (Fig. S7-2).
+If the “p” value returned by the Rayleigh test (2) is less than 0.05, the null hypothesis of a random orientation from a uniform distribution can be rejected.
 The second statistical method takes into account artifact orientation and plunge.
 Three normalized eigenvalues (E1, E2 and E3) are calculated from the cosine formed by the axis of the artifact with the three axes of space.
 Benn’s indices (1994) are used to describe fabric shape.
@@ -476,13 +482,13 @@ The « p-value » returned by the Rayleigh test is :
 **Particle size distribution of flint remains**
 
 The particle size distribution of the lithic remains is carried out using granulizeR (<https://marchaeologist.shinyapps.io/granulizeR/>).
-All figures and statistics can be reproduced using the particle size data file available in the SOM of this article directly in the application.
+All figures and statistics can be reproduced using the particle size data file available in the Supplementary Dataset S2 directly in the application.
 The application uses the method proposed by Lenoble (2005) and Bertran *et al.* (2006b).
 The archaeological samples are compared to an experimental knapping particle size model in a ternary diagram.
-We have adapted the particle size distribution model to the technological content of SU 18-19 by combining data from the experimental Levallois, discoidal and blade reduction sequences available in Bertran *et al.* (2006a).
+We have adapted the particle size distribution model to the technological content of SU 18, 19 and 18/19 by combining data from the experimental Levallois, discoidal and blade reduction sequences available in Bertran *et al.* (2006a).
 The model (blue area) is constructed using the Mahalanobis method (detection of the outliers in the dataset) and takes into account the counts of lithic artifacts between 2 and 4 mm, 4 and 10 mm, and greater than 10 mm.\bigbreak
 
-**Systematic conjoining of lithic fragments from SU 18 and SU 18-19**
+**Systematic conjoining of lithic fragments from SU 18, 19 and 18/19**
 
 The systematic testing of conjoinable lithic fragments can provide important information concerning the transport of material both during occupations (i.e., anthropogenic action) and the site formation processes (i.e., natural).
 This method involves a systematic search for "fracture connections" (Tixier 1980) on blade and flake fragments, whether retouched or not (Bordes 2000).
@@ -490,7 +496,7 @@ A systematic conjoining program offers two advantages compared to the traditiona
 Firstly, in the vast majority of cases, the two surfaces of a break are complementary over their entire surface, making it easier to identify connections compared to refitting dorsal and ventral surfaces.
 Moreover, due to its systematic nature, results are easily quantifiable, allowing success rates to be compared between layers or sites.
 
-The systematic search for fracture connections amongst the SU 18-19 lithic assemblage was carried out in several stages:
+The systematic search for fracture connections amongst the SU 18 and 19 lithic assemblage was carried out in several stages:
 
 -   first, all flake and blade fragments with a break greater than 15 mm long and a thickness greater than 5 mm were selected;
 
@@ -509,16 +515,17 @@ The conjoin success rate (P) was then calculated as: (4) $$P = number~of~connect
 
 ## Spatial projections of plotted pieces per stratigraphic units and types
 
-Projections of the assemblage by stratigraphic field units (SU) depict a single layer of archaeological material whose rocky base appears less dense in archaeological material (fig. S7-\ref{field_us_projection}).
-No immediately perceptible organization is evident when the Châtelperronian and Mousterian lithics, shell beads and pigments are projected in sagittal view (fig. S7-\ref{projection_types}B).
-However, in plan view (fig. S7-\ref{projection_types}A), the Châtelperronian lithics appear to cluster in the square K5 (-12,0 \< x \< - 11,0 and 5,0 \< y \< 6,0).
-The projections in plan and section of the five main species comprising the SU 18-19 faunal assemblage reveal no clearly identifiable patterning (fig. S7- \ref{species_projection}. The visual inspection of artifact projections in plan and section are insufficient to reliably associate the shell beads, pigments or specific species with either the Mousterian or Châtelperronian component of SU 18-19. \bigbreak
+Projections of the assemblage by stratigraphic field units (SU) depict a single layer of archaeological material whose rocky base appears less dense in archaeological material (fig. S\ref{field_us_projection}).
+No immediately perceptible organization is evident when the Châtelperronian and Mousterian lithics, shell beads and pigments are projected in sagittal view (fig. S\ref{projection_types}B).
+However, in plan view (fig. S\ref{projection_types}A), the Châtelperronian lithics appear to cluster in the square K5 (-12,0 \< x \< - 11,0 and 5,0 \< y \< 6,0).
+The projections in plan and section of the five main species comprising the SU 18, 19 and 18/19 faunal assemblage reveal no clearly identifiable patterning (fig. S\ref{species_projection}. The visual inspection of artifact projections in plan and section is insufficient to reliably associate the shell beads, pigments or specific species with either the Mousterian or Châtelperronian component of SU 18, 19 and 18/19. \bigbreak
 
 ```{r field_us_projection, cache = TRUE, fig.cap="Plan view (A) and one-meter thick transect (B; Y-Z with 45° rotation of XY axis) of all piece-plotted material from SU 18, 18/19 and 19. \\label{field_us_projection}", echo = FALSE, message = FALSE, fig.height = 8}
 
 xy_proj <- ggplot(data_xyz,aes(x, y, color=as.factor(article_corpus))) + 
   geom_point() + 
-  scale_color_manual(values = c('#868686FF', '#EFC000FF', '#0073C2FF', '#CD534CFF')) +
+  scale_color_manual(values = c('#868686FF', '#EFC000FF', '#0073C2FF', '#CD534CFF'),
+                     labels = c("SU 18", "SU 18/19", "SU 19")) +
   theme(legend.position = "right",
         legend.justification = c("right", "top"),
         legend.box.just = "right",
@@ -613,17 +620,17 @@ ggdraw() +
 
 ## Fabric analysis of archaeological remains
 
-When measurements from SU 18-19 are computed together, the point pattern in the Benn diagram stretches from the planar pole to an intermediate position between the planar (PL) and elongation (EL) poles (fig. S7-\ref{fig:fabric_analysis}A).
-Within this general pattern, three subgroups can be distinguished by a planar/isotropic “void” (between groups 2 and 3; fig. S7-\ref{fig:fabric_analysis}A) and planar/elongated “void” (between groups 1 and 2/3; fig. S7-\ref{fig:fabric_analysis}A).
+When measurements from SU 18 and 19 are computed together, the point pattern in the Benn diagram stretches from the planar pole to an intermediate position between the planar (PL) and elongation (EL) poles (fig. S\ref{fig:fabric_analysis}A).
+Within this general pattern, three subgroups can be distinguished by a planar/isotropic “void” (between groups 2 and 3; fig. S\ref{fig:fabric_analysis}A) and planar/elongated “void” (between groups 1 and 2/3; fig. S\ref{fig:fabric_analysis}A).
 In plan view, these three subgroups are distributed downslope (group 1) and upslope (group 3), separated by a third, much more planar group (group 2).
-When data for each group is treated separately, group 1 is located between the planar and elongation poles of the Benn diagram (fig. S7-\ref{fig:fabric_analysis}C).
-A reject ratio (Tr) of 84 % confirming a strong preferential orientation of the remains along the main slope of the deposits (Table S7-1; fig. S7-\ref{fig:fabric_analysis}D and E) with a steep plunge (fig. S7-\ref{fig:fabric_analysis}F) consistent with the presence of a solifluction lobe with a stony front in the downslope excavated area (square J5; cf. Todisco, Mallol *et al.* 2023).
-The fabric of group 2 is more planar (fig. S7-\ref{fig:fabric_analysis}C and D) and displays no preferential orientation (Tr = 0 in Table S7-1; fig. S7-\ref{fig:fabric_analysis}D) but a slight plunge, characteristic of undisturbed lithic assemblage or shallow surface water runoff on a gentle slope.
-The fabric of the third group is more isotropic (fig. S7-\ref{fig:fabric_analysis}C) with no preferential orientation (Tr = 0 in Table S7-1) but a steeper plunge.
+When data for each group is treated separately, group 1 is located between the planar and elongation poles of the Benn diagram (fig. S\ref{fig:fabric_analysis}C).
+A reject ratio (Tr) of 84 % confirming a strong preferential orientation of the remains along the main slope of the deposits (Table S17; fig. S\ref{fig:fabric_analysis}D and E) with a steep plunge (fig. S\ref{fig:fabric_analysis}F) consistent with the presence of a solifluction lobe with a stony front in the downslope excavated area (square J5; cf. Todisco, Mallol *et al.* 2023).
+The fabric of group 2 is more planar (fig. S\ref{fig:fabric_analysis}C and D) and displays no preferential orientation (Tr = 0 in Table S17; fig. S\ref{fig:fabric_analysis}D) but a slight plunge, characteristic of undisturbed lithic assemblage or shallow surface water runoff on a gentle slope.
+The fabric of the third group is more isotropic (fig. S\ref{fig:fabric_analysis}C) with no preferential orientation (Tr = 0 in Table S17) but a steeper plunge.
 This pattern could fit with objects deposited in a context of rock fall and/or bioturbated sediment.
 \bigbreak
 
-Table 1.
+Table 17.
 Summary results of the fabric analysis.
 
 ```{r fab_stats, echo=FALSE, message = FALSE, include = FALSE}
@@ -672,7 +679,7 @@ knitr::kable(res_fab, format="pandoc")
 ## Particle size distribution of the lithic remains
 
 Analysis of the particle size distribution by spit (2 cm thick), sub-square and stratigraphic unit shows a clear difference between units 18/19, 19 and unit 18.
-The SU 18 spits in the upslope (K4 III-IV, J4 III-IV) and downslope areas (K5 IV, K5 III-IV) tend to cluster in or near the zone of experimental reduction sequences in all the sub-squares (fig. S7-\ref{fig:granulo} ; Supplementary Table S2).
+The SU 18 spits in the upslope (K4 III-IV, J4 III-IV) and downslope areas (K5 IV, K5 III-IV) tend to cluster in or near the zone of experimental reduction sequences in all the sub-squares (fig. S\ref{fig:granulo} ; Supplementary Dataset S2).
 On the other hand, none of the SU 18 spits in the central band (K5 II-I, J5 I-II) fall within the zone of experimental reduction sequences due to the lack of pieces larger than 10 mm.
 
 The spits from SU 18/19 and 19 show a clear particle size sorting in favor of the smallest particles.
@@ -683,7 +690,7 @@ For these reasons, the following spatial exploration only considers the remains 
 
 \blandscape
 
-```{r fabric_analysis, out.extra='angle=0', echo = FALSE, message=FALSE, fig.align='center', fig.cap='SU 18-19 fabrics: (A) Benn diagram of all measurements (combined SU); (B) Plan view with the three identified fabric groups; (C) Benn diagrams, (D) Schmidt diagrams, (E) Orientation rose diagrams, and (F) Plunge rose diagrams for each of the three groups.', out.width='0.95\\linewidth'}
+```{r fabric_analysis, out.extra='angle=0', echo = FALSE, message=FALSE, fig.align='center', fig.cap='SU 18/19 fabrics: (A) Benn diagram of all measurements (combined SU); (B) Plan view with the three identified fabric groups; (C) Benn diagrams, (D) Schmidt diagrams, (E) Orientation rose diagrams, and (F) Plunge rose diagrams for each of the three groups.', out.width='0.95\\linewidth'}
 knitr::include_graphics("./fig_def/fabric_analysis.pdf")
 ```
 
@@ -829,7 +836,7 @@ synthetic_SC
 
 The density analyses according to artifact type reveal three clear patterns:
 
--   Mousterian lithics and bison bones cluster primarily in the upslope and downslope excavation areas (fig. S7-\ref{kernel});
+-   Mousterian lithics and bison bones cluster primarily in the upslope and downslope excavation areas (fig. S\ref{kernel});
 
 -   Châtelperronian lithics, shell beads and pigments all cluster in the same zone;
 
@@ -960,8 +967,8 @@ points(d_mth_ppp$x, d_mth_ppp$y, pch=20, cex = 0.2)
 
 ## Spatial dependency of plotted remains within types (Ripley's K, homogeneous and inhomogeneous functions)
 
-Ripley's homogeneous K function shows aggregated structures for each type (fig. S7-\ref{kest}).
-However, the inhomogeneous functions show structures compatible with Poisson processes except for the Mousterian lithic remains and bison bones, which show attractive links below a radius of 0.3 to 0.4 metres (fig. S7-\ref{kinhom}).
+Ripley's homogeneous K function shows aggregated structures for each type (fig. S\ref{kest}).
+However, the inhomogeneous functions show structures compatible with Poisson processes except for the Mousterian lithic remains and bison bones, which show attractive links below a radius of 0.3 to 0.4 metres (fig. S\ref{kinhom}).
 The results return by the inhomogeneous function for the other types are compatible with a CSR pattern and could be due to smaller sample sizes.
 
 ```{r kest, echo = FALSE, cache = TRUE, warning = FALSE, results = FALSE, message = FALSE, include  = TRUE, fig.height = 8.5, fig.cap="Result of the Ripley's K 'homogeneous' function by artifact type. \\label{kest}"}
@@ -1010,7 +1017,7 @@ plot(spatstat.explore::envelope(d_cab_ppp, Kinhom, correction = "isotropic"), ma
 
 ## Spatial dependency between plotted remains according to type (Ripley's K intertype, homogeneous function)
 
-When the spatial dependency between remains types are tested (fig. S7-\ref{kcross}), it appears that :
+When the spatial dependency between remains types are tested (fig. S\ref{kcross}), it appears that :
 
 -   Chatelperronian lithics versus shell beads, Chatelperronian lithics versus pigments and shell beads versus pigments are all spatially associated two by two.
 
@@ -1108,7 +1115,7 @@ bead_n_col_mat_ppp = ppp(bead_n_col_mat$x, bead_n_col_mat$y, w_big, marks = as.f
 
 ## Spatial dependency between plotted remains according to type (Ripley's K intertype, inhomogeneous function)
 
-When applied to the same pairs of remains, the inhomogeneous Ripley's K intertype function shows no particular pattern (fig. S7-\ref{kcross_inhom} ; this test appears unsatisfactory and returns unreadable graphs).
+When applied to the same pairs of remains, the inhomogeneous Ripley's K intertype function shows no particular pattern (fig. S\ref{kcross_inhom} ; this test appears unsatisfactory and returns unreadable graphs).
 The spatial dependence (homogeneous intertype K function) between Châtelperronian lithic remains, shell beads and pigments could be caused by both first-order property and the second-order property.
 An interesting result is the lack of spatial dependence for the same test for pairs of Mousterian lithic remains, shell beads and pigments for this smaller observation window.
 However, due to the heterogeneity of the point pattern, a larger window would give all associated types two by two.
@@ -1138,7 +1145,7 @@ plot(spatstat.explore::envelope(bead_n_col_mat_ppp, Kcross.inhom, correction = "
 
 ## Spatial links between plotted remains according to lithic cultural attributions and species (Ripley's K intertype homogeneous)
 
-The Ripley’s K intertype test for spatial associations between the two SU 18 chrono-cultural components and the five main species demonstrates (fig. S7-\ref{kcross_CP_species} and fig. S7-\ref{kcross_moust_species}):
+The Ripley’s K intertype test for spatial associations between the two SU 18 chrono-cultural components and the five main species demonstrates (fig. S\ref{kcross_CP_species} and fig. S\ref{kcross_moust_species}):
 
 -   Mousterian lithics to be associated with bison remains;
 
@@ -1208,12 +1215,12 @@ plot(spatstat.explore::envelope(moust_n_rhino_ppp, Kcross, correction = "isotrop
 
 ## Spatial analysis of lithic surface states
 
-The results of the fabric and Kernel density analysis suggest the two main clusters of Mousterian lithics and the accumulation of Châtelperronian lithics result from distinct site formation processes that might be reflected in the preservation of the material (fig. S7-\ref{lithic_surf_state_projection}).
-To test this, the two Mousterian clusters were distinguished (fig. S7-\ref{moust_sep_clusters}) using the ‘dbscan’ algorithm that groups points according to their density and eliminates outliers as noise (Ester *et al.* 1996).
-The preservation of the lithics comprising these two groups was subsequently compared to that of the Châtelperronian component (fig. S7-\ref{barplots_lithic_states}).
-The Mousterian lithics in cluster 1 concentrate in the downslope area of the excavated surface (square J5) and are generally well preserved (fig. S7-\ref{moust_sep_clusters} and S7-\ref{barplots_lithic_states}; around 50 % of the lithics belong to type 1 surface alterations, few to types 3 or 4).
+The results of the fabric and Kernel density analysis suggest the two main clusters of Mousterian lithics and the accumulation of Châtelperronian lithics result from distinct site formation processes that might be reflected in the preservation of the material (fig. S\ref{lithic_surf_state_projection}).
+To test this, the two Mousterian clusters were distinguished (fig. S\ref{moust_sep_clusters}) using the ‘dbscan’ algorithm that groups points according to their density and eliminates outliers as noise (Ester *et al.* 1996).
+The preservation of the lithics comprising these two groups was subsequently compared to that of the Châtelperronian component (fig. S\ref{barplots_lithic_states}).
+The Mousterian lithics in cluster 1 concentrate in the downslope area of the excavated surface (square J5) and are generally well preserved (fig. S\ref{moust_sep_clusters} and S\ref{barplots_lithic_states}; around 50 % of the lithics belong to type 1 surface alterations, few to types 3 or 4).
 This pattern is in good agreement with slow movements over short distances such as those due to solifluction.
-Moreover, the cluster 1 lithics are spatially coincident with fabric group 1 (see fig. S7-\ref{barplots_lithic_states} above).
+Moreover, the cluster 1 lithics are spatially coincident with fabric group 1 (see fig. S\ref{barplots_lithic_states} above).
 Châtelperronian lithics, on the other hand, are generally well preserved, consistent with limited disturbance.
 Finally, the cluster 2 Mousterian material is substantially less well preserved, with more than 50 % of them belonging to type 3 and including significantly more type 4 pieces.
 Concentrating upslope, at the base of the limestone cliff and towards the summit of SU 18, the composition of this cluster likely reflects the combined action of rock fall connected to the retreat of the cliff and collapse of the overhang, longer artifact transport distances, and the introduction of material from above the cliff.
@@ -1318,43 +1325,43 @@ ggdraw() +
 
 ```
 
-## Systematic conjoining of lithic fragments from SU 18-19
+## Systematic conjoining of lithic fragments from SU 18, 19 and 18/19
 
-For the SU 18-19 lithic assemblage, 363 fragments out of a total of 865 were selected according to the criteria described above (breakage greater than 15 mm long and thickness greater than 5 mm): 149 proximal fragments, 95 mesial fragments, and 119 distal fragments.
+For the SU 18, 19 and 18/19 lithic assemblage, 363 fragments out of a total of 865 were selected according to the criteria described above (breakage greater than 15 mm long and thickness greater than 5 mm): 149 proximal fragments, 95 mesial fragments, and 119 distal fragments.
 In terms of chrono-cultural attribution, the sample comprises primarily indeterminate fragments (80.7 %, n = 193), followed by those attributable to the Mousterian (15.9 %, n = 58) and Châtelperronian fragments (3.3 %, n = 12).
 In the end, the conjoining program produced seven connections out of a possible 52,121, giving a p-value of 1.92 %, equivalent to that obtained for Lévêque’s EJOP sup / EJOP (Gravina *et al.* 2018).
 The connections concern six fragments attributed to the Mousterian, two to the Châtelperronian, and six indeterminate fragments.
 
-This extremely low success rate is highly unlikely to reflect techno-economic choices of the groups responsible for the SU 18-19 assemblage.
+This extremely low success rate is highly unlikely to reflect techno-economic choices of the groups responsible for the SU 18, 19 and 18/19 assemblage.
 Instead, it is better interpreted as resulting from the incorporation of archaeological material unrelated to the occupation of the collapsed rockshelter into a partially soliflucted stratigraphic unit that equally underwent some degree of gravitational sorting (movement of pieces downslope and out of the excavation window) in the context of an open-air slope deposit reworked under periglacial conditions.
 The fact that several of the conjoined pieces exhibit lustred surfaces combined with breaks or steep mechanical edge damage with double patinas would be consistent with at least two phases of artifact transport.
 
-# 7.3. A model for the formation of SU 18-19
+# 7.3. A model for the formation of SU 18, 19 and 18/19
 
-The different lines of evidence outlined above, combined with geoarchaeological information (Todisco, Mallol *et al.* 2023), allow a hypothetical formation history for SU 18 and 19 to be proposed (Fig. 4 in main text) :
+The different lines of evidence outlined above, combined with geoarchaeological information (Todisco, Mallol *et al.* 2023), allow a hypothetical formation history for SU 18 and 19 to be proposed (fig. 4 in main text) :
 
--   *Phase 1* : Initial Mousterian occupation of the collapsed rock-shelter and overlying plateau.
-    An initial Mousterian (Discoid and/or Levallois) occupation took place at the base of the limesone cliff on the collapsed rock-shelter and overlying slopes (*cf.* SOM 3) with an emphasis on the processing of bison carcasses.
+-   *Phase 1*: Initial Mousterian occupation of the collapsed rock-shelter and overlying plateau.
+    An initial Mousterian (Discoid and/or Levallois) occupation took place at the base of the limestone cliff on the collapsed rock-shelter and overlying slopes with an emphasis on the processing of bison carcasses.
     These occupations were contemporaneous with the activity of the stone-banked solifluction lobe whose front developed in square J5 (Todisco, Maillol *et al.* 2023; fabric analysis, group 1).
     Larger objects were moved upwards to the surface due to the action of ice heave (cryoexpulsion) and remobilized with other similarly sized pieces downslope, forming the semi-circular stony front of the lobe.
     These processes ultimately resulted in a higher density of material in the distal excavated area.
     Simultaneously, smaller objects were down-sorted between the reworked rock fall deposit.
     Despite this remobilization, the lithic material from phase 1 is relatively well preserved.
 
--   *Phase 2* : A brief Châtelperronian stop-over on a reworked Mousterian substrate.
-    Once the solifluction lobe was inactive (i.e., fossilized), Châtelperronian groups set up a very localized area of technical activity, primarily in square K5, which included the maintenance of stone tools (*cf.* SOM 3) and the manufacture of shell beads as well as ocher use.
+-   *Phase 2*: A brief Châtelperronian stop-over on a reworked Mousterian substrate.
+    Once the solifluction lobe was inactive (i.e., fossilized), Châtelperronian groups set up a very localized area of technical activity, primarily in square K5, which included the maintenance of stone tools and the manufacture of shell beads as well as ocher use.
     This likely short occupation, typical of this techno-complex (Bachellerie 2011), cannot be reliably associated with any particular faunal species, which, of course, does not rule out Châtelperronian groups carrying out subsistence activities on-site.
     During this phase, sedimentation is primarily dominated by shallow surface runoff (low energy flow) resulting in relatively good preservation of the lithic surfaces and relatively unaltered spatial associations between different artifact types.
     Limited transport of the highly mobile shell beads is, however, evidenced by their being wedged against the limestone blocks in SU 18.
 
--   *Phase 3* : Abandonment of the rock-shelter and introduction of exogenous artifacts.
+-   *Phase 3*: Abandonment of the rock-shelter and introduction of exogenous artifacts.
     Mousterian lithics and faunal remains (primarily bison) abandoned on the portion above the site (top of the cliff) during the phase 1 occupation are introduced into the shelter via the expanding diaclase.
     These processes are reflected in the heavily altered surfaces of the lithic material clustered towards the base of the cliff and at the summit of SU 18, where they become mixed with material from phases 1 and 2.
     This exogenous input is further reinforced by the arrival of fine-grained sediments (such as clay, silt, sand) from the slopes above the cliff and the presence of numerous geofacts at the top of SU 18 (Todisco, Mallol *et al.* 2023).
 
 \pagebreak
 
-# Bibliography
+# References
 
 BACHELLERIE F.
 (2011) ‒ Quelle unité pour le Châtelperronien?:

@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.6.27)  28 JUL 2025 11:10
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.8.1)  1 AUG 2025 10:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **spatial_and_site_formation.tex
 (./spatial_and_site_formation.tex
 LaTeX2e <2025-06-01> patch level 1
-L3 programming layer <2025-05-26>
+L3 programming layer <2025-07-20>
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/size10.clo
@@ -256,7 +256,11 @@ Package graphics Info: Driver file: pdftex.def on input line 106.
 \Gin@req@width=\dimen186
 )
 \pandoc@box=\box63
-(c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/pdflscape/pdflscape.sty
+(c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/chngcntr/chngcntr.sty
+Package: chngcntr 2018/04/09 v1.1a change counter resetting
+Package chngcntr Info: \counterwithout already defined.
+(chngcntr)             Quitting chngcntr on input line 21.
+) (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/pdflscape/pdflscape.sty
 Package: pdflscape 2025-06-23 v0.14 Display of landscape pages in PDF
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/pdflscape/pdflscape-nometadata.sty
 Package: pdflscape-nometadata 2025-06-23 v0.14 Display of landscape pages in PDF (HO)
@@ -267,7 +271,7 @@ Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
 )) (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/bookmark/bookmark.sty
 Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref.sty
-Package: hyperref 2025-06-21 v7.01n Hypertext links for LaTeX
+Package: hyperref 2025-07-12 v7.01o Hypertext links for LaTeX
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
 Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
 ) (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
@@ -303,7 +307,7 @@ Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO)
 \Hy@linkcounter=\count312
 \Hy@pagecounter=\count313
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.def
-File: pd1enc.def 2025-06-21 v7.01n Hyperref: PDFDocEncoding definition (HO)
+File: pd1enc.def 2025-07-12 v7.01o Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
 ... no UTF-8 mapping file for font encoding PD1
 ) (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/intcalc/intcalc.sty
@@ -311,24 +315,24 @@ Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
 \Hy@SavedSpaceFactor=\count314
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/puenc.def
-File: puenc.def 2025-06-21 v7.01n Hyperref: PDF Unicode definition (HO)
+File: puenc.def 2025-07-12 v7.01o Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
 ... no UTF-8 mapping file for font encoding PU
 )
-Package hyperref Info: Option `unicode' set `true' on input line 4052.
-Package hyperref Info: Hyper figures OFF on input line 4181.
-Package hyperref Info: Link nesting OFF on input line 4186.
-Package hyperref Info: Hyper index ON on input line 4189.
-Package hyperref Info: Plain pages OFF on input line 4196.
-Package hyperref Info: Backreferencing OFF on input line 4201.
+Package hyperref Info: Option `unicode' set `true' on input line 4066.
+Package hyperref Info: Hyper figures OFF on input line 4195.
+Package hyperref Info: Link nesting OFF on input line 4200.
+Package hyperref Info: Hyper index ON on input line 4203.
+Package hyperref Info: Plain pages OFF on input line 4210.
+Package hyperref Info: Backreferencing OFF on input line 4215.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
-Package hyperref Info: Bookmarks ON on input line 4448.
+Package hyperref Info: Bookmarks ON on input line 4462.
 \c@Hy@tempcnt=\count315
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
-LaTeX Info: Redefining \url on input line 4787.
+LaTeX Info: Redefining \url on input line 4801.
 \XeTeXLinkMargin=\dimen188
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/bitset/bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
@@ -338,20 +342,20 @@ Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
 \Fld@menulength=\count316
 \Field@Width=\dimen189
 \Fld@charsize=\dimen190
-Package hyperref Info: Hyper figures OFF on input line 6066.
-Package hyperref Info: Link nesting OFF on input line 6071.
-Package hyperref Info: Hyper index ON on input line 6074.
-Package hyperref Info: backreferencing OFF on input line 6081.
-Package hyperref Info: Link coloring OFF on input line 6086.
-Package hyperref Info: Link coloring with OCG OFF on input line 6091.
-Package hyperref Info: PDF/A mode OFF on input line 6096.
+Package hyperref Info: Hyper figures OFF on input line 6078.
+Package hyperref Info: Link nesting OFF on input line 6083.
+Package hyperref Info: Hyper index ON on input line 6086.
+Package hyperref Info: backreferencing OFF on input line 6093.
+Package hyperref Info: Link coloring OFF on input line 6098.
+Package hyperref Info: Link coloring with OCG OFF on input line 6103.
+Package hyperref Info: PDF/A mode OFF on input line 6108.
 \Hy@abspage=\count317
 \c@Item=\count318
 \c@Hfootnote=\count319
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/hpdftex.def
-File: hpdftex.def 2025-06-21 v7.01n Hyperref driver for pdfTeX
+File: hpdftex.def 2025-07-12 v7.01o Hyperref driver for pdfTeX
 \Fld@listcount=\count320
 \c@bookmark@seq@number=\count321
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
@@ -366,33 +370,33 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 28
 File: bkm-pdftex.def 2023-12-10 v1.31 bookmark driver for pdfTeX and luaTeX (HO)
 \BKM@id=\count322
 ))
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 87.
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 89.
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
-File: l3backend-pdftex.def 2025-04-14 L3 backend support: PDF output (pdfTeX)
+File: l3backend-pdftex.def 2025-06-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count323
 ) (./spatial_and_site_formation.aux)
 \openout1 = `spatial_and_site_formation.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 89.
+LaTeX Font Info:    ... okay on input line 89.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 89.
+LaTeX Font Info:    ... okay on input line 89.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 89.
+LaTeX Font Info:    ... okay on input line 89.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 89.
+LaTeX Font Info:    ... okay on input line 89.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 89.
+LaTeX Font Info:    ... okay on input line 89.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 89.
+LaTeX Font Info:    ... okay on input line 89.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 89.
+LaTeX Font Info:    ... okay on input line 89.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 89.
+LaTeX Font Info:    ... okay on input line 89.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 89.
+LaTeX Font Info:    ... okay on input line 89.
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
@@ -433,44 +437,44 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring OFF on input line 87.
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 89.
+Package hyperref Info: Link coloring OFF on input line 89.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 91.
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 89.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 91.
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 89.
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 91.
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 89.
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 91.
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 89.
+(Font)              <12> on input line 91.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 89.
+(Font)              <8> on input line 91.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 89.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 89.
+(Font)              <6> on input line 91.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 91.
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 89.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 91.
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 107.
+(Font)              <10> on input line 111.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 107.
+(Font)              <7> on input line 111.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 107.
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 129.
+(Font)              <5> on input line 111.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 134.
 (c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -485,17 +489,17 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 <spatial_and_site_formation_files/figure-latex/field_us_projection-1.pdf, id=42, 469.755pt x 578.16pt>
 File: spatial_and_site_formation_files/figure-latex/field_us_projection-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/field_us_projection-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/field_us_projection-1.pdf  used on input line 374.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/field_us_projection-1.pdf  used on input line 378.
 (pdftex.def)             Requested size: 469.75386pt x 578.15858pt.
 <spatial_and_site_formation_files/figure-latex/projection_types-1.pdf, id=43, 469.755pt x 578.16pt>
 File: spatial_and_site_formation_files/figure-latex/projection_types-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/projection_types-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/projection_types-1.pdf  used on input line 382.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/projection_types-1.pdf  used on input line 386.
 (pdftex.def)             Requested size: 469.75386pt x 578.15858pt.
 <spatial_and_site_formation_files/figure-latex/species_projection-1.pdf, id=44, 469.755pt x 505.89pt>
 File: spatial_and_site_formation_files/figure-latex/species_projection-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/species_projection-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/species_projection-1.pdf  used on input line 392.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/species_projection-1.pdf  used on input line 396.
 (pdftex.def)             Requested size: 469.75386pt x 505.88875pt.
 
 
@@ -511,10 +515,10 @@ Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/species_p
 <./fig_def/fabric_analysis.pdf, id=104, 845.0471pt x 597.51233pt>
 File: ./fig_def/fabric_analysis.pdf Graphic file (type pdf)
 <use ./fig_def/fabric_analysis.pdf>
-Package pdftex.def Info: ./fig_def/fabric_analysis.pdf  used on input line 473.
+Package pdftex.def Info: ./fig_def/fabric_analysis.pdf  used on input line 476.
 (pdftex.def)             Requested size: 617.90651pt x 436.928pt.
 
-LaTeX Warning: Float too large for page by 3.67297pt on input line 478.
+LaTeX Warning: Float too large for page by 3.67297pt on input line 481.
 
 
 
@@ -522,32 +526,32 @@ LaTeX Warning: Float too large for page by 3.67297pt on input line 478.
 <./fig_def/granulo_som.pdf, id=254, 580.1675pt x 850.57072pt>
 File: ./fig_def/granulo_som.pdf Graphic file (type pdf)
 <use ./fig_def/granulo_som.pdf>
-Package pdftex.def Info: ./fig_def/granulo_som.pdf  used on input line 484.
+Package pdftex.def Info: ./fig_def/granulo_som.pdf  used on input line 487.
 (pdftex.def)             Requested size: 422.77664pt x 619.82126pt.
 <spatial_and_site_formation_files/figure-latex/kernel-1.pdf, id=256, 469.755pt x 614.295pt>
 File: spatial_and_site_formation_files/figure-latex/kernel-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/kernel-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kernel-1.pdf  used on input line 511.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kernel-1.pdf  used on input line 514.
 (pdftex.def)             Requested size: 469.75386pt x 614.29349pt.
 <spatial_and_site_formation_files/figure-latex/kest-1.pdf, id=259, 469.755pt x 614.295pt>
 File: spatial_and_site_formation_files/figure-latex/kest-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/kest-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kest-1.pdf  used on input line 530.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kest-1.pdf  used on input line 533.
 (pdftex.def)             Requested size: 469.75386pt x 614.29349pt.
 <spatial_and_site_formation_files/figure-latex/kinhom-1.pdf, id=260, 469.755pt x 614.295pt>
 File: spatial_and_site_formation_files/figure-latex/kinhom-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/kinhom-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kinhom-1.pdf  used on input line 537.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kinhom-1.pdf  used on input line 540.
 (pdftex.def)             Requested size: 469.75386pt x 614.29349pt.
 <spatial_and_site_formation_files/figure-latex/kcross-1.pdf, id=262, 469.755pt x 614.295pt>
 File: spatial_and_site_formation_files/figure-latex/kcross-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/kcross-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kcross-1.pdf  used on input line 562.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kcross-1.pdf  used on input line 565.
 (pdftex.def)             Requested size: 469.75386pt x 614.29349pt.
 <spatial_and_site_formation_files/figure-latex/kcross_inhom-1.pdf, id=264, 469.755pt x 614.295pt>
 File: spatial_and_site_formation_files/figure-latex/kcross_inhom-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/kcross_inhom-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kcross_inhom-1.pdf  used on input line 587.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kcross_inhom-1.pdf  used on input line 590.
 (pdftex.def)             Requested size: 469.75386pt x 614.29349pt.
 
 
@@ -570,27 +574,27 @@ Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kcross_in
 <spatial_and_site_formation_files/figure-latex/kcross_CP_species-1.pdf, id=667, 469.755pt x 614.295pt>
 File: spatial_and_site_formation_files/figure-latex/kcross_CP_species-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/kcross_CP_species-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kcross_CP_species-1.pdf  used on input line 611.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kcross_CP_species-1.pdf  used on input line 613.
 (pdftex.def)             Requested size: 469.75386pt x 614.29349pt.
 <spatial_and_site_formation_files/figure-latex/kcross_moust_species-1.pdf, id=668, 469.755pt x 614.295pt>
 File: spatial_and_site_formation_files/figure-latex/kcross_moust_species-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/kcross_moust_species-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kcross_moust_species-1.pdf  used on input line 619.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/kcross_moust_species-1.pdf  used on input line 621.
 (pdftex.def)             Requested size: 469.75386pt x 614.29349pt.
 <spatial_and_site_formation_files/figure-latex/lithic_surf_state_projection-1.pdf, id=675, 469.755pt x 433.62pt>
 File: spatial_and_site_formation_files/figure-latex/lithic_surf_state_projection-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/lithic_surf_state_projection-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/lithic_surf_state_projection-1.pdf  used on input line 661.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/lithic_surf_state_projection-1.pdf  used on input line 662.
 (pdftex.def)             Requested size: 469.75386pt x 433.61894pt.
 <spatial_and_site_formation_files/figure-latex/moust_sep_clusters-1.pdf, id=676, 469.755pt x 216.81pt>
 File: spatial_and_site_formation_files/figure-latex/moust_sep_clusters-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/moust_sep_clusters-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/moust_sep_clusters-1.pdf  used on input line 669.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/moust_sep_clusters-1.pdf  used on input line 670.
 (pdftex.def)             Requested size: 469.75386pt x 216.80946pt.
 <spatial_and_site_formation_files/figure-latex/barplots_lithic_states-1.pdf, id=677, 469.755pt x 216.81pt>
 File: spatial_and_site_formation_files/figure-latex/barplots_lithic_states-1.pdf Graphic file (type pdf)
 <use spatial_and_site_formation_files/figure-latex/barplots_lithic_states-1.pdf>
-Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/barplots_lithic_states-1.pdf  used on input line 676.
+Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/barplots_lithic_states-1.pdf  used on input line 677.
 (pdftex.def)             Requested size: 469.75386pt x 216.80946pt.
 
 
@@ -609,19 +613,19 @@ Package pdftex.def Info: spatial_and_site_formation_files/figure-latex/barplots_
 [94] (./spatial_and_site_formation.aux)
  ***********
 LaTeX2e <2025-06-01> patch level 1
-L3 programming layer <2025-05-26>
+L3 programming layer <2025-07-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 11650 strings out of 469867
- 188283 string characters out of 5482197
- 592703 words of memory out of 5000000
- 39709 multiletter control sequences out of 15000+600000
+ 11674 strings out of 469782
+ 189049 string characters out of 5480069
+ 595769 words of memory out of 5000000
+ 39814 multiletter control sequences out of 15000+600000
  677501 words of font info for 81 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  89i,8n,93p,1507b,524s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb><c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr5.pfb><c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb><c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb><c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy5.pfb><c:/Users/marc.thomas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb>
-Output written on spatial_and_site_formation.pdf (23 pages, 2889174 bytes).
+Output written on spatial_and_site_formation.pdf (23 pages, 2888155 bytes).
 PDF statistics:
  876 PDF objects out of 1000 (max. 8388607)
  553 compressed objects within 6 object streams
